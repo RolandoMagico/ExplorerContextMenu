@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ContextMenu</name>
+    </assembly>
+    <members>
+        <member name="T:ContextMenu.MainWindow">
+            <summary>
+            Main window of the application.
+            </summary>
+        </member>
+        <member name="M:ContextMenu.MainWindow.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ContextMenu.MainWindow"/> class.
+            </summary>
+        </member>
+        <member name="M:ContextMenu.MainWindow.HandleEvent_treeViewNavigator_BeforeExpand(System.Object,System.Windows.Forms.TreeViewCancelEventArgs)">
+            <summary>
+            Handles the event <see cref="E:System.Windows.Forms.TreeView.BeforeExpand"/> of <see cref="F:ContextMenu.MainWindow.treeViewNavigator"/>.
+            </summary>
+            <param name="sender">The sender.</param>
+            <param name="e">The event arguments.</param>
+        </member>
+        <member name="M:ContextMenu.MainWindow.HandleEvent_treeViewNavigator_NodeMouseClick(System.Object,System.Windows.Forms.TreeNodeMouseClickEventArgs)">
+            <summary>
+            Handles the event <see cref="E:System.Windows.Forms.TreeView.NodeMouseClick"/> of <see cref="F:ContextMenu.MainWindow.treeViewNavigator"/>.
+            </summary>
+            <param name="sender">The sender.</param>
+            <param name="e">The event arguments.</param>
+        </member>
+        <member name="F:ContextMenu.MainWindow.components">
+            <summary>
+            Erforderliche Designervariable.
+            </summary>
+        </member>
+        <member name="M:ContextMenu.MainWindow.Dispose(System.Boolean)">
+            <summary>
+            Verwendete Ressourcen bereinigen.
+            </summary>
+            <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
+        </member>
+        <member name="M:ContextMenu.MainWindow.InitializeComponent">
+            <summary>
+            Erforderliche Methode für die Designerunterstützung.
+            Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
+            </summary>
+        </member>
+        <member name="T:ContextMenu.Program">
+            <summary>
+            The entry class of the application.
+            </summary>
+        </member>
+        <member name="M:ContextMenu.Program.Main">
+            <summary>
+            The entry method of the application.
+            </summary>
+        </member>
+    </members>
+</doc>

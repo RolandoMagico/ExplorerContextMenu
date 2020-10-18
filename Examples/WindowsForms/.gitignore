@@ -2,3 +2,5 @@
 /*.user
 /obj
 /packages
+/bin/*/Debug/
+/bin/*/Release/*.pdb
