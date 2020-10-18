@@ -50,7 +50,65 @@
 /***********************************************************************************************************************
  IMPLEMENTATION
 ***********************************************************************************************************************/
+namespace ContextQuickie
+{
+  NetExplorerContextMenuEntry::NetExplorerContextMenuEntry()
+  {
+  }
 
+  NetExplorerContextMenuEntry::NetExplorerContextMenuEntry(ExplorerContextMenuEntry* entry)
+  {
+    this->CopyNativeData(entry);
+  }
+
+  void NetExplorerContextMenuEntry::CopyNativeData(ExplorerContextMenuEntry* entry)
+  {
+    this->nativeEntry = entry;
+
+    // Copy data for this instance
+    if (this->nativeEntry->Text != nullptr)
+    {
+      this->Text = gcnew String(this->nativeEntry->Text->c_str());
+    }
+
+    if (this->nativeEntry->BitmapHandle != nullptr)
+    {
+      Bitmap^ bitmap = Bitmap::FromHbitmap(IntPtr(this->nativeEntry->BitmapHandle));
+      bitmap->MakeTransparent();
+      this->icon = bitmap;
+    }
+
+    // Create child entries
+    for each (ExplorerContextMenuEntry* nativeEntry in this->nativeEntry->menuEntries)
+    {
+      NetExplorerContextMenuEntry^ entry = gcnew NetExplorerContextMenuEntry(nativeEntry);
+      this->childs->Add(entry);
+    }
+  }
+
+  void NetExplorerContextMenuEntry::ExecuteCommand()
+  {
+    if (this->nativeEntry != nullptr)
+    {
+      this->nativeEntry->ExecuteCommand();
+    }
+  }
+
+  Boolean NetExplorerContextMenuEntry::IsSeperator::get()
+  {
+    return this->nativeEntry->IsSeparator;
+  }
+
+  Image^ NetExplorerContextMenuEntry::Icon::get()
+  {
+    return this->icon;
+  }
+
+  IEnumerable<NetExplorerContextMenuEntry^>^ NetExplorerContextMenuEntry::Childs::get()
+  {
+    return this->childs;
+  }
+}
 /***********************************************************************************************************************
  EOF
 ***********************************************************************************************************************/

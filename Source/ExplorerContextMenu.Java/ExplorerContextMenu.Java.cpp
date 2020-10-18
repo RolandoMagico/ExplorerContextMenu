@@ -81,7 +81,7 @@ JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenu_execute
 {
   if (Java_explorercontextmenu_menu_ExplorerContextMenu_Menu != nullptr)
   {
-    Java_explorercontextmenu_menu_ExplorerContextMenu_Menu->ExecuteCommand((uint32_t)commandId);
+    Java_explorercontextmenu_menu_ExplorerContextMenu_Menu->ExecuteCommand();
   }
 }
 

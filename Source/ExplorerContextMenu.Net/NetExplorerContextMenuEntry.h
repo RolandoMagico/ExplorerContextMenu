@@ -26,7 +26,7 @@
  INCLUDES
 ***********************************************************************************************************************/
 #pragma once
-#include "NetExplorerContextMenuEntry.h"
+#include "ExplorerContextMenuEntry.h"
 
 /***********************************************************************************************************************
  CLASS
@@ -34,11 +34,38 @@
 namespace ContextQuickie
 {
   using namespace System;
+  using namespace System::Collections::Generic;
+  using namespace System::Drawing;
 
   public ref class NetExplorerContextMenuEntry
   {
+  private:
+    Image^ icon;
+    ExplorerContextMenuEntry* nativeEntry;
+    List<NetExplorerContextMenuEntry^>^ childs = gcnew List<NetExplorerContextMenuEntry^>();
+
+  internal:
+    NetExplorerContextMenuEntry(ExplorerContextMenuEntry* entry);
+    void CopyNativeData(ExplorerContextMenuEntry* entry);
+
   public:
+    NetExplorerContextMenuEntry();
+    void ExecuteCommand();
     property String^ Text;
+    property Boolean IsSeperator
+    {
+      Boolean get();
+    }
+
+    property IEnumerable<NetExplorerContextMenuEntry^>^ Childs
+    {
+      IEnumerable<NetExplorerContextMenuEntry^>^ get();
+    }
+
+    property Image^ Icon
+    {
+      Image^ get();
+    }
   };
 }
 

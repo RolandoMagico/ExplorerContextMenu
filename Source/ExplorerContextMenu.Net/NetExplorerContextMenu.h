@@ -37,13 +37,13 @@ namespace ContextQuickie
   using namespace System::Collections::Generic;
   using namespace ContextQuickie;
 
-  public ref class NetExplorerContextMenu
+  public ref class NetExplorerContextMenu : public NetExplorerContextMenuEntry
   {
   private:
     int handle;
+    ExplorerContextMenu* nativeMenu;
   public:
     NetExplorerContextMenu(List<String^>^ paths);
-    property List<NetExplorerContextMenuEntry^>^ Entries;
   };
 }
 

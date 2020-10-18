@@ -191,6 +191,9 @@
     <ClCompile Include="NetExplorerContextMenu.cpp" />
     <ClCompile Include="NetExplorerContextMenuEntry.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Drawing" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

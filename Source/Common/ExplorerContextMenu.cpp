@@ -95,18 +95,18 @@ namespace ContextQuickie
             {
               flags |= CMF_EXTENDEDVERBS;
             }
-
-            if (SUCCEEDED(result = SHCreateDefaultContextMenu(&defaultContextMenu, IID_IContextMenu3, (void**)&(this->ContextMenu))))
+            IContextMenu* contextMenu;
+            if (SUCCEEDED(result = SHCreateDefaultContextMenu(&defaultContextMenu, IID_IContextMenu3, (void**)&(contextMenu))))
             {
-              result = this->ContextMenu->QueryContextMenu(menu, 0, 0, UINT_MAX, flags);
+              result = contextMenu->QueryContextMenu(menu, 0, 0, UINT_MAX, flags);
             }
-            else if (SUCCEEDED(result = SHCreateDefaultContextMenu(&defaultContextMenu, IID_IContextMenu2, (void**)&(this->ContextMenu))))
+            else if (SUCCEEDED(result = SHCreateDefaultContextMenu(&defaultContextMenu, IID_IContextMenu2, (void**)&(contextMenu))))
             {
-              result = this->ContextMenu->QueryContextMenu(menu, 0, 0, UINT_MAX, flags);
+              result = contextMenu->QueryContextMenu(menu, 0, 0, UINT_MAX, flags);
             }
-            else if (SUCCEEDED(result = SHCreateDefaultContextMenu(&defaultContextMenu, IID_IContextMenu, (void**)&(this->ContextMenu))))
+            else if (SUCCEEDED(result = SHCreateDefaultContextMenu(&defaultContextMenu, IID_IContextMenu, (void**)&(contextMenu))))
             {
-              result = this->ContextMenu->QueryContextMenu(menu, 0, 0, UINT_MAX, flags);
+              result = contextMenu->QueryContextMenu(menu, 0, 0, UINT_MAX, flags);
             }
 
             if (SUCCEEDED(result))
@@ -120,26 +120,6 @@ namespace ContextQuickie
           desktop->Release();
         }
       }
-    }
-  }
-
-  void ExplorerContextMenu::ExecuteCommand(uint32_t commandId)
-  {
-    CMINVOKECOMMANDINFO info = { 0 };
-    info.cbSize = sizeof(info);
-    info.hwnd = GetCurrentWindowHandle();
-    info.lpVerb = MAKEINTRESOURCEA(commandId);
-    if (this->ContextMenu != nullptr)
-    {
-      this->ContextMenu->InvokeCommand(&info);
-    }
-    else if (this->ContextMenu != nullptr)
-    {
-      this->ContextMenu->InvokeCommand(&info);
-    }
-    else if (this->ContextMenu != nullptr)
-    {
-      this->ContextMenu->InvokeCommand(&info);
     }
   }
 

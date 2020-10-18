@@ -29,34 +29,44 @@
 #include "ExplorerContextMenu.h"
 #include "NetExplorerContextMenu.h"
 
+/***********************************************************************************************************************
+ DEFINES
+***********************************************************************************************************************/
+
+/***********************************************************************************************************************
+ TYPES
+***********************************************************************************************************************/
+
+/***********************************************************************************************************************
+ LOCAL CONSTANTS
+***********************************************************************************************************************/
+
+/***********************************************************************************************************************
+ LOCAL VARIABLES
+***********************************************************************************************************************/
+
+/***********************************************************************************************************************
+ LOCAL FUNCTION DECLARATIONS
+***********************************************************************************************************************/
+
+/***********************************************************************************************************************
+ IMPLEMENTATION
+***********************************************************************************************************************/
 namespace ContextQuickie
 {
-    using namespace System::Runtime::InteropServices;
+  using namespace System::Runtime::InteropServices;
 
-    NetExplorerContextMenu::NetExplorerContextMenu(List<String^>^ paths)
+  NetExplorerContextMenu::NetExplorerContextMenu(List<String^>^ paths)
+  {
+    vector<wstring> convertedPaths;
+    for each (String ^ path in paths)
     {
-#if 0
-      wchar_t** localPaths = static_cast<wchar_t**>(malloc(sizeof(wchar_t*) * paths->Count));
-      for (int i = 0; i < paths->Count; i++)
-      {
-        localPaths[i] = static_cast<wchar_t*>(Marshal::StringToHGlobalUni(paths[i]).ToPointer());
-      }
-
-      int entriesCount = ContextMenuProvider_CreateContextMenu((const wchar_t**)localPaths, paths->Count);
-
-      this->Entries = gcnew List<ShellContextMenuEntry^>();
-      for (int entryIndex = 0; entryIndex < entriesCount; entryIndex++)
-      {
-        ContextMenuProvider_MenuEntry entry;
-        if (ContextMenuProvider_GetContextMenuEntry(entryIndex, &entry) != 0)
-        {
-          ShellContextMenuEntry^ entry = gcnew ShellContextMenuEntry();
-          entry->Text = gcnew String(entry->Text);
-          this->Entries->Add(entry);
-        }
-      }
-#endif
+      convertedPaths.push_back(static_cast<wchar_t*>(Marshal::StringToHGlobalUni(path).ToPointer()));
     }
+
+    this->nativeMenu = new ExplorerContextMenu(convertedPaths);
+    this->CopyNativeData(this->nativeMenu);
+  }
 }
 
 /***********************************************************************************************************************

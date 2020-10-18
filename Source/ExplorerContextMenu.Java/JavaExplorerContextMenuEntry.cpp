@@ -95,7 +95,7 @@ void JavaExplorerContextMenuEntry::CopyEntries(ExplorerContextMenuEntry& entry)
   {
     JavaExplorerContextMenuEntry wrapper(this->javaEnvironment, entry.menuEntries[index]);
     this->AddEntry(wrapper);
-    wrapper.CopyEntries(entry.menuEntries[index]);
+    wrapper.CopyEntries(*(entry.menuEntries[index]));
   }
 }
 

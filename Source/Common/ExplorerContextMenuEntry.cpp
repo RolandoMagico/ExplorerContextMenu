@@ -63,12 +63,17 @@ namespace ContextQuickie
     this->BitmapHeight = 0;
     this->CommandId = 0;
     this->IsSeparator = false;
-    this->menuEntries = vector<ExplorerContextMenuEntry>();
+    this->menuEntries = vector<ExplorerContextMenuEntry*>();
     this->Text = nullptr;
   }
 
   ExplorerContextMenuEntry::~ExplorerContextMenuEntry()
   {
+    for (size_t entryIndex = 0; entryIndex < this->menuEntries.size(); entryIndex++)
+    {
+      delete this->menuEntries[entryIndex];
+    }
+
     if (this->Text != nullptr)
     {
       delete this->Text;
@@ -78,9 +83,12 @@ namespace ContextQuickie
   void ExplorerContextMenuEntry::GetMenuData(HMENU menu)
   {
     int menuItemCount = GetMenuItemCount(menu);
-    this->menuEntries = vector<ExplorerContextMenuEntry>(menuItemCount);
+
     for (uint32_t menuIndex = 0; menuIndex < (uint32_t)menuItemCount; menuIndex++)
     {
+      ExplorerContextMenuEntry* entry = new ExplorerContextMenuEntry();
+      this->menuEntries.push_back(entry);
+
       MENUITEMINFO menuInfo;
 
       menuInfo.fMask = MIIM_STRING;
@@ -93,7 +101,7 @@ namespace ContextQuickie
         menuInfo.dwTypeData = buffer;
         if (GetMenuItemInfo(menu, menuIndex, true, &menuInfo) == TRUE)
         {
-          this->menuEntries[menuIndex].Text = new wstring(buffer);
+          entry->Text = new wstring(buffer);
         }
         else
         {
@@ -115,11 +123,11 @@ namespace ContextQuickie
       }
       else if (menuInfo.fType == MFT_SEPARATOR)
       {
-        this->menuEntries[menuIndex].IsSeparator = true;
+        entry->IsSeparator = true;
       }
       else
       {
-        this->menuEntries[menuIndex].IsSeparator = false;
+        entry->IsSeparator = false;
       }
 
       menuInfo.fMask = MIIM_ID;
@@ -130,14 +138,14 @@ namespace ContextQuickie
       }
       else
       {
-        this->menuEntries[menuIndex].CommandId = menuInfo.wID;
+        entry->CommandId = menuInfo.wID;
       }
 
       menuInfo.fMask = MIIM_BITMAP;
       menuInfo.cbSize = sizeof(MENUITEMINFO);
-      this->menuEntries[menuIndex].BitmapHandle = nullptr;
-      this->menuEntries[menuIndex].BitmapWidth = 0;
-      this->menuEntries[menuIndex].BitmapHeight = 0;
+      entry->BitmapHandle = nullptr;
+      entry->BitmapWidth = 0;
+      entry->BitmapHeight = 0;
       if (GetMenuItemInfo(menu, menuIndex, true, &menuInfo) == false)
       {
         /* TODO: Error handling if the text cannot be retrieved */
@@ -147,9 +155,9 @@ namespace ContextQuickie
         BITMAP bitMap;
         if (GetObject(menuInfo.hbmpItem, sizeof(BITMAP), &bitMap) != 0)
         {
-          this->menuEntries[menuIndex].BitmapHandle = (uint32_t*)menuInfo.hbmpItem;
-          this->menuEntries[menuIndex].BitmapWidth = bitMap.bmWidth;
-          this->menuEntries[menuIndex].BitmapHeight = bitMap.bmHeight;
+          entry->BitmapHandle = (uint32_t*)menuInfo.hbmpItem;
+          entry->BitmapWidth = bitMap.bmWidth;
+          entry->BitmapHeight = bitMap.bmHeight;
         }
       }
 
@@ -161,8 +169,20 @@ namespace ContextQuickie
       }
       else if (menuInfo.hSubMenu != nullptr)
       {
-        this->menuEntries[menuIndex].GetMenuData(menuInfo.hSubMenu);
+        entry->GetMenuData(menuInfo.hSubMenu);
       }
+    }
+  }
+
+  void ExplorerContextMenuEntry::ExecuteCommand()
+  {
+    if (this->ContextMenu != nullptr)
+    {
+      CMINVOKECOMMANDINFO info = { 0 };
+      info.cbSize = sizeof(info);
+      // TODO: info.hwnd = GetCurrentWindowHandle();
+      info.lpVerb = MAKEINTRESOURCEA(this->CommandId);
+      this->ContextMenu->InvokeCommand(&info);
     }
   }
 
@@ -172,28 +192,10 @@ namespace ContextQuickie
     for (size_t entryIndex = 0; entryIndex < this->menuEntries.size(); entryIndex++)
     {
       count++;
-      count += this->menuEntries[entryIndex].GetAllEntriesCount();
+      count += this->menuEntries[entryIndex]->GetAllEntriesCount();
     }
 
     return count;
-  }
-
-  ExplorerContextMenuEntry* ExplorerContextMenuEntry::GetEntry(size_t startIndex, size_t index)
-  {
-    for (size_t entryIndex = 0; entryIndex < this->menuEntries.size(); entryIndex++)
-    {
-      if (index == startIndex)
-      {
-        return &(this->menuEntries[entryIndex]);
-      }
-      else if ((startIndex + index) < this->menuEntries[entryIndex].GetAllEntriesCount())
-      {
-        return this->menuEntries[entryIndex].GetEntry(startIndex + 1, index);
-      }
-      startIndex++;
-    }
-
-    return nullptr;
   }
 
   void ExplorerContextMenuEntry::PrintMenu(uint32_t level)
@@ -210,7 +212,7 @@ namespace ContextQuickie
 
     for (size_t childIndex = 0; childIndex < this->menuEntries.size(); childIndex++)
     {
-      this->menuEntries[childIndex].PrintMenu(level + 1);
+      this->menuEntries[childIndex]->PrintMenu(level + 1);
     }
   }
 }

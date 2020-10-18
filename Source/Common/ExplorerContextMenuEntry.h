@@ -38,6 +38,9 @@ namespace ContextQuickie
 {
   class ExplorerContextMenuEntry
   {
+  private:
+    IContextMenu* ContextMenu = nullptr;
+
   public:
     wstring* Text;
     bool IsSeparator;
@@ -45,12 +48,12 @@ namespace ContextQuickie
     uint32_t BitmapWidth;
     uint32_t BitmapHeight;
     uint32_t* BitmapHandle;
-    vector<ExplorerContextMenuEntry> menuEntries;
+    vector<ExplorerContextMenuEntry*> menuEntries;
     ExplorerContextMenuEntry();
     ~ExplorerContextMenuEntry();
     size_t GetAllEntriesCount();
-    ExplorerContextMenuEntry* GetEntry(size_t startIndex, size_t index);
     void GetMenuData(HMENU menu);
+    void ExecuteCommand();
     void PrintMenu(uint32_t level = 0);
   };
 }

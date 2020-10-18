@@ -42,12 +42,11 @@ namespace ContextQuickie
   class ExplorerContextMenu : public ExplorerContextMenuEntry
   {
   private:
-    IContextMenu* ContextMenu = nullptr;
     static HWND GetCurrentWindowHandle();
     static uint32_t GetNumberOfEntries(HMENU menu);
+
   public:
     ExplorerContextMenu(vector<wstring> paths);
-    void ExecuteCommand(uint32_t commandId);
   };
 }
 /***********************************************************************************************************************
