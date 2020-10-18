@@ -1,0 +1,11 @@
+/.vs
+/ExplorerContextMenu*/.vs
+/ExplorerContextMenu*/*.user
+/ExplorerContextMenu*/bin/Debug
+/ExplorerContextMenu*/obj
+/ExplorerContextMenu*/bin/Release/*/*.exp
+/ExplorerContextMenu*/bin/Release/*/*.iobj
+/ExplorerContextMenu*/bin/Release/*/*.ipdb
+/ExplorerContextMenu*/bin/Release/*/*.lib
+/ExplorerContextMenu*/bin/Release/*/*.pdb
+/ExplorerContextMenu.Java/explorercontextmenu

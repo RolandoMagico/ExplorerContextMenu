@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="..\Common\ExplorerContextMenu.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\ExplorerContextMenuEntry.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="NetExplorerContextMenu.cpp">
+      <Filter>Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="NetExplorerContextMenuEntry.cpp">
+      <Filter>Wrapper</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Common\ExplorerContextMenu.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ExplorerContextMenuEntry.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="NetExplorerContextMenu.h">
+      <Filter>Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="NetExplorerContextMenuEntry.h">
+      <Filter>Wrapper</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Common">
+      <UniqueIdentifier>{7f65d33f-36ab-48ef-8483-03e2976d3542}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Wrapper">
+      <UniqueIdentifier>{c6e1a26c-6ac1-4e11-b3f9-18afe7aab35d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
