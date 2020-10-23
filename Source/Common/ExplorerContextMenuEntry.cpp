@@ -32,6 +32,7 @@
 /***********************************************************************************************************************
  DEFINES
 ***********************************************************************************************************************/
+#define GET_KEY_STATE_KEY_PRESSED   (0x8000u)
 
 /***********************************************************************************************************************
  TYPES
@@ -176,6 +177,10 @@ namespace ContextQuickie
 
   void ExplorerContextMenuEntry::GetMenuData(IContextMenu* contextMenu, uint32_t flags)
   {
+    if ((GetKeyState(VK_SHIFT) & GET_KEY_STATE_KEY_PRESSED) == GET_KEY_STATE_KEY_PRESSED)
+    {
+      flags |= CMF_EXTENDEDVERBS;
+    }
     HMENU menu = CreatePopupMenu();
     if (SUCCEEDED(contextMenu->QueryContextMenu(menu, 0, 0, UINT_MAX, flags)))
     {

@@ -33,7 +33,7 @@
 /***********************************************************************************************************************
  DEFINES
 ***********************************************************************************************************************/
-#define GET_KEY_STATE_KEY_PRESSED   (0x8000u)
+
 /***********************************************************************************************************************
  TYPES
 ***********************************************************************************************************************/
@@ -69,23 +69,17 @@ namespace ContextQuickie
     }
     else if (SUCCEEDED(result = CoInitialize(nullptr)))
     {
-      ITEMIDLIST** itemIdList = new ITEMIDLIST * [paths.size()];
-      for (size_t pathIndex = 0; (pathIndex < paths.size()) && SUCCEEDED(result); pathIndex++)
+      IShellFolder* desktop = nullptr;
+      if (SUCCEEDED(result = SHGetDesktopFolder(&desktop)))
       {
-        result = SHParseDisplayName(paths[pathIndex].c_str(), nullptr, &(itemIdList[pathIndex]), 0, NULL);
-      }
-
-      if (SUCCEEDED(result))
-      {
-        IShellFolder* desktop = nullptr;
-        if (SUCCEEDED(result = SHGetDesktopFolder(&desktop)))
+        ITEMIDLIST** itemIdList = new ITEMIDLIST * [paths.size()];
+        for (size_t pathIndex = 0; (pathIndex < paths.size()) && SUCCEEDED(result); pathIndex++)
         {
-          UINT flags = CMF_DEFAULTONLY;
-          if ((GetKeyState(VK_SHIFT) & GET_KEY_STATE_KEY_PRESSED) == GET_KEY_STATE_KEY_PRESSED)
-          {
-            flags |= CMF_EXTENDEDVERBS;
-          }
+          result = desktop->ParseDisplayName(NULL, NULL, (LPWSTR)paths[pathIndex].c_str(), nullptr, &(itemIdList[pathIndex]), NULL);
+        }
 
+        if (SUCCEEDED(result))
+        {
           HWND windowHandle = GetCurrentWindowHandle();
           if (windowHandle != nullptr)
           {
@@ -108,7 +102,7 @@ namespace ContextQuickie
 
             if (SUCCEEDED(result))
             {
-              this->GetMenuData(contextMenu, flags);
+              this->GetMenuData(contextMenu, CMF_DEFAULTONLY);
             }
           }
 
@@ -177,9 +171,9 @@ namespace ContextQuickie
 
               RegCloseKey(contextMenuHandlers);
             }
-          }
 
-          desktop->Release();
+            desktop->Release();
+          }
         }
       }
     }
