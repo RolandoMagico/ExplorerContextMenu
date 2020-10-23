@@ -174,6 +174,17 @@ namespace ContextQuickie
     }
   }
 
+  void ExplorerContextMenuEntry::GetMenuData(IContextMenu* contextMenu, uint32_t flags)
+  {
+    HMENU menu = CreatePopupMenu();
+    if (SUCCEEDED(contextMenu->QueryContextMenu(menu, 0, 0, UINT_MAX, flags)))
+    {
+      this->GetMenuData(menu);
+    }
+
+    DestroyMenu(menu);
+  }
+
   void ExplorerContextMenuEntry::ExecuteCommand()
   {
     if (this->ContextMenu != nullptr)

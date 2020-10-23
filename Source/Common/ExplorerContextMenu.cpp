@@ -108,10 +108,7 @@ namespace ContextQuickie
 
             if (SUCCEEDED(result))
             {
-              HMENU menu = CreatePopupMenu();
-              result = contextMenu->QueryContextMenu(menu, 0, 0, UINT_MAX, flags);
-              this->GetMenuData(menu);
-              DestroyMenu(menu);
+              this->GetMenuData(contextMenu, flags);
             }
           }
 
@@ -143,6 +140,12 @@ namespace ContextQuickie
                       GUID CLSID_NewMenu;
                       if (SUCCEEDED(result = CLSIDFromString(buffer2, &CLSID_NewMenu)))
                       {
+                      }
+                      else if (SUCCEEDED(result = CLSIDFromString(buffer, &CLSID_NewMenu)))
+                      {
+                      }
+                      if (SUCCEEDED(result))
+                      {
                         if (SUCCEEDED(result = CoCreateInstance(CLSID_NewMenu, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellExtInit))))
                         {
                           if (SUCCEEDED(result = shellExtInit->Initialize(NULL, dataObject, NULL)))
@@ -160,10 +163,7 @@ namespace ContextQuickie
 
                             if (SUCCEEDED(result))
                             {
-                              HMENU menu = CreatePopupMenu();
-                              result = contextMenu->QueryContextMenu(menu, 0, 0, UINT_MAX, CMF_NORMAL);
-                              this->GetMenuData(menu);
-                              DestroyMenu(menu);
+                              this->GetMenuData(contextMenu, CMF_NORMAL);
                             }
 
                             shellExtInit->Release();
