@@ -80,6 +80,12 @@ namespace ContextQuickie
         IShellFolder* desktop = nullptr;
         if (SUCCEEDED(result = SHGetDesktopFolder(&desktop)))
         {
+          UINT flags = CMF_DEFAULTONLY;
+          if ((GetKeyState(VK_SHIFT) & GET_KEY_STATE_KEY_PRESSED) == GET_KEY_STATE_KEY_PRESSED)
+          {
+            flags |= CMF_EXTENDEDVERBS;
+          }
+
           HWND windowHandle = GetCurrentWindowHandle();
           if (windowHandle != nullptr)
           {
@@ -89,32 +95,88 @@ namespace ContextQuickie
             defaultContextMenu.cidl = (UINT)paths.size();
             defaultContextMenu.apidl = (LPCITEMIDLIST*)itemIdList;
 
-            HMENU menu = CreatePopupMenu();
-            UINT flags = CMF_NORMAL;
-            if ((GetKeyState(VK_SHIFT) & GET_KEY_STATE_KEY_PRESSED) == GET_KEY_STATE_KEY_PRESSED)
-            {
-              flags |= CMF_EXTENDEDVERBS;
-            }
             IContextMenu* contextMenu;
             if (SUCCEEDED(result = SHCreateDefaultContextMenu(&defaultContextMenu, IID_IContextMenu3, (void**)&(contextMenu))))
             {
-              result = contextMenu->QueryContextMenu(menu, 0, 0, UINT_MAX, flags);
             }
             else if (SUCCEEDED(result = SHCreateDefaultContextMenu(&defaultContextMenu, IID_IContextMenu2, (void**)&(contextMenu))))
             {
-              result = contextMenu->QueryContextMenu(menu, 0, 0, UINT_MAX, flags);
             }
             else if (SUCCEEDED(result = SHCreateDefaultContextMenu(&defaultContextMenu, IID_IContextMenu, (void**)&(contextMenu))))
             {
-              result = contextMenu->QueryContextMenu(menu, 0, 0, UINT_MAX, flags);
             }
 
             if (SUCCEEDED(result))
             {
+              HMENU menu = CreatePopupMenu();
+              result = contextMenu->QueryContextMenu(menu, 0, 0, UINT_MAX, flags);
               this->GetMenuData(menu);
+              DestroyMenu(menu);
             }
+          }
 
-            DestroyMenu(menu);
+          IDataObject* dataObject;
+          if (SUCCEEDED(result = desktop->GetUIObjectOf(windowHandle, (UINT)paths.size(), (LPCITEMIDLIST*)itemIdList, IID_IDataObject, NULL, (void**)&dataObject)))
+          {
+            LSTATUS registryResult;
+            HKEY contextMenuHandlers = nullptr;
+            wstring registryPath(L"*\\shellex\\ContextMenuHandlers");
+            if ((registryResult = RegOpenKeyEx(HKEY_CLASSES_ROOT, registryPath.c_str(), 0, KEY_READ, &contextMenuHandlers)) == ERROR_SUCCESS)
+            {
+              DWORD numberOfSubKey = 0;
+              DWORD subKeyMaxLength = 0;
+              if ((registryResult = RegQueryInfoKey(contextMenuHandlers, NULL, NULL, NULL, &numberOfSubKey, &subKeyMaxLength, NULL, NULL, NULL, NULL, NULL, NULL)) == ERROR_SUCCESS)
+              {
+                for (DWORD keyIndex = 0; keyIndex < numberOfSubKey; keyIndex++)
+                {
+                  wchar_t* buffer = new wchar_t[subKeyMaxLength + 1];
+                  DWORD numberOfReadBytes = subKeyMaxLength + 1;
+                  if ((registryResult = RegEnumKeyEx(contextMenuHandlers, keyIndex, buffer, &numberOfReadBytes, NULL, NULL, NULL, NULL)) == ERROR_SUCCESS)
+                  {
+                    wprintf(L"%ls\n", buffer);
+                    wchar_t buffer2[255];
+                    DWORD bufferLength = sizeof(buffer2);
+                    if ((registryResult = RegGetValue(contextMenuHandlers, buffer, NULL, RRF_RT_REG_SZ, NULL, buffer2, &bufferLength)) == ERROR_SUCCESS)
+                    {
+                      wprintf(L"%ls\n", buffer2);
+                      IShellExtInit* shellExtInit;
+                      GUID CLSID_NewMenu;
+                      if (SUCCEEDED(result = CLSIDFromString(buffer2, &CLSID_NewMenu)))
+                      {
+                        if (SUCCEEDED(result = CoCreateInstance(CLSID_NewMenu, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellExtInit))))
+                        {
+                          if (SUCCEEDED(result = shellExtInit->Initialize(NULL, dataObject, NULL)))
+                          {
+                            IContextMenu* contextMenu;
+                            if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_IContextMenu3, (void**)&(contextMenu))))
+                            {
+                            }
+                            else if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_IContextMenu2, (void**)&(contextMenu))))
+                            {
+                            }
+                            else if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_IContextMenu, (void**)&(contextMenu))))
+                            {
+                            }
+
+                            if (SUCCEEDED(result))
+                            {
+                              HMENU menu = CreatePopupMenu();
+                              result = contextMenu->QueryContextMenu(menu, 0, 0, UINT_MAX, CMF_NORMAL);
+                              this->GetMenuData(menu);
+                              DestroyMenu(menu);
+                            }
+
+                            shellExtInit->Release();
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+
+              RegCloseKey(contextMenuHandlers);
+            }
           }
 
           desktop->Release();
