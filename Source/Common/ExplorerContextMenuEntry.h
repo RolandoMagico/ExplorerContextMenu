@@ -44,6 +44,8 @@ namespace ContextQuickie
 
   public:
     wstring* Text;
+    wstring* CommandString;
+    wstring* HelpText;
     bool IsSeparator;
     uint32_t CommandId;
     uint32_t BitmapWidth;

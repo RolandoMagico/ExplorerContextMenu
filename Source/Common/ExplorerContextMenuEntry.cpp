@@ -72,9 +72,25 @@ namespace ContextQuickie
     : ExplorerContextMenuEntry()
   {
     this->ContextMenu = contextMenu;
-    MENUITEMINFO menuInfo;
+
     wchar_t buffer[1024] = { 0 };
 
+    // Get data from IContextMenu
+    memset(buffer, 0, sizeof(buffer));
+    if (SUCCEEDED(contextMenu->GetCommandString(index, GCS_VERBW, NULL, (CHAR*)buffer, sizeof(buffer))))
+    {
+      this->CommandString = new wstring(buffer);
+    }
+
+    memset(buffer, 0, sizeof(buffer));
+    if (SUCCEEDED(contextMenu->GetCommandString(index, GCS_HELPTEXTW, NULL, (CHAR*)buffer, sizeof(buffer))))
+    {
+      this->HelpText = new wstring(buffer);
+    }
+
+    // Get data from MENUITEMINFO
+    MENUITEMINFO menuInfo;
+    memset(buffer, 0, sizeof(buffer));
     menuInfo.fMask = MIIM_BITMAP | MIIM_CHECKMARKS | MIIM_DATA | MIIM_FTYPE | MIIM_ID | MIIM_STATE | MIIM_STRING | MIIM_SUBMENU;
     menuInfo.cbSize = sizeof(MENUITEMINFO);
     menuInfo.dwTypeData = buffer;
@@ -106,6 +122,17 @@ namespace ContextQuickie
           this->BitmapHeight = bitMap.bmHeight;
         }
       }
+      else
+      {
+        IExtractIcon* extractIcon;
+        if (SUCCEEDED(contextMenu->QueryInterface(IID_PPV_ARGS(&extractIcon))))
+        {          
+          int index;
+          UINT flags;
+          memset(buffer, 0, sizeof(buffer));
+          extractIcon->GetIconLocation(NULL, buffer, sizeof(buffer), &index, &flags);
+        }
+      }
 
       if (menuInfo.hSubMenu != nullptr)
       {
@@ -128,6 +155,11 @@ namespace ContextQuickie
     if (this->Text != nullptr)
     {
       delete this->Text;
+    }
+
+    if (this->HelpText != nullptr)
+    {
+      delete this->HelpText;
     }
   }
 
