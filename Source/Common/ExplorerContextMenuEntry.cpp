@@ -73,83 +73,48 @@ namespace ContextQuickie
   {
     this->ContextMenu = contextMenu;
     MENUITEMINFO menuInfo;
+    wchar_t buffer[1024] = { 0 };
 
-    menuInfo.fMask = MIIM_STRING;
+    menuInfo.fMask = MIIM_BITMAP | MIIM_CHECKMARKS | MIIM_DATA | MIIM_FTYPE | MIIM_ID | MIIM_STATE | MIIM_STRING | MIIM_SUBMENU;
     menuInfo.cbSize = sizeof(MENUITEMINFO);
-    menuInfo.dwTypeData = nullptr;
-    if ((GetMenuItemInfo(menu, index, true, &menuInfo) == TRUE) && (menuInfo.cch != 0))
+    menuInfo.dwTypeData = buffer;
+    menuInfo.cch = sizeof(buffer);
+    if ((GetMenuItemInfo(menu, index, true, &menuInfo) == TRUE))
     {
-      menuInfo.cch++;
-      wchar_t* buffer = new wchar_t[menuInfo.cch];
-      menuInfo.dwTypeData = buffer;
-      if (GetMenuItemInfo(menu, index, true, &menuInfo) == TRUE)
+      if (menuInfo.cch != 0)
       {
         this->Text = new wstring(buffer);
       }
+
+      if (menuInfo.fType == MFT_SEPARATOR)
+      {
+        this->IsSeparator = true;
+      }
       else
       {
-        /* TODO: Error handling if the text cannot be retrieved */
+        this->IsSeparator = false;
+        this->CommandId = menuInfo.wID;
       }
 
-      delete[] buffer;
-    }
-    else
-    {
-      /* TODO: Error handling if the text cannot be retrieved */
-    }
-
-    menuInfo.fMask = MIIM_FTYPE;
-    menuInfo.cbSize = sizeof(MENUITEMINFO);
-    if (GetMenuItemInfo(menu, index, true, &menuInfo) == false)
-    {
-      /* TODO: Error handling if the type cannot be retrieved */
-    }
-    else if (menuInfo.fType == MFT_SEPARATOR)
-    {
-      this->IsSeparator = true;
-    }
-    else
-    {
-      this->IsSeparator = false;
-    }
-
-    menuInfo.fMask = MIIM_ID;
-    menuInfo.cbSize = sizeof(MENUITEMINFO);
-    if (GetMenuItemInfo(menu, index, true, &menuInfo) == false)
-    {
-      /* TODO: Error handling if the type cannot be retrieved */
-    }
-    else
-    {
-      this->CommandId = menuInfo.wID;
-    }
-
-    menuInfo.fMask = MIIM_BITMAP;
-    menuInfo.cbSize = sizeof(MENUITEMINFO);
-    if (GetMenuItemInfo(menu, index, true, &menuInfo) == false)
-    {
-      /* TODO: Error handling if the text cannot be retrieved */
-    }
-    else if (menuInfo.hbmpItem != nullptr)
-    {
-      BITMAP bitMap;
-      if (GetObject(menuInfo.hbmpItem, sizeof(BITMAP), &bitMap) != 0)
+      if (menuInfo.hbmpItem != nullptr)
       {
-        this->BitmapHandle = (uint32_t*)menuInfo.hbmpItem;
-        this->BitmapWidth = bitMap.bmWidth;
-        this->BitmapHeight = bitMap.bmHeight;
+        BITMAP bitMap;
+        if (GetObject(menuInfo.hbmpItem, sizeof(BITMAP), &bitMap) != 0)
+        {
+          this->BitmapHandle = (uint32_t*)menuInfo.hbmpItem;
+          this->BitmapWidth = bitMap.bmWidth;
+          this->BitmapHeight = bitMap.bmHeight;
+        }
+      }
+
+      if (menuInfo.hSubMenu != nullptr)
+      {
+        this->AddEntries(contextMenu, menuInfo.hSubMenu, true);
       }
     }
-
-    menuInfo.fMask = MIIM_SUBMENU;
-    menuInfo.cbSize = sizeof(MENUITEMINFO);
-    if (GetMenuItemInfo(menu, index, true, &menuInfo) == false)
+    else
     {
-      /* TODO: Error handling if the text cannot be retrieved */
-    }
-    else if (menuInfo.hSubMenu != nullptr)
-    {
-      this->AddEntries(contextMenu, menuInfo.hSubMenu, true);
+      /* TODO: Error handling if the menu info cannot be retrieved */
     }
   }
 
@@ -262,4 +227,3 @@ namespace ContextQuickie
     }
   }
 }
-
