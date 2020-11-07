@@ -148,76 +148,100 @@ namespace ContextQuickie
   {
     HRESULT result = S_OK;
     IDataObject* dataObject;
-    if (SUCCEEDED(result = desktop->GetUIObjectOf(NULL, itemIdListLength, itemIdList, IID_IDataObject, NULL, (void**)&dataObject)))
+    LSTATUS registryResult;
+    HKEY contextMenuHandlers = nullptr;
+    const wstring registryPath(L"*\\shellex\\ContextMenuHandlers");
+    DWORD numberOfSubKey = 0;
+    DWORD subKeyMaxLength = 0;
+
+    if (FAILED(result = desktop->GetUIObjectOf(NULL, itemIdListLength, itemIdList, IID_IDataObject, NULL, (void**)&dataObject)))
     {
-      LSTATUS registryResult;
-      HKEY contextMenuHandlers = nullptr;
-      wstring registryPath(L"*\\shellex\\ContextMenuHandlers");
-      if ((registryResult = RegOpenKeyEx(HKEY_CLASSES_ROOT, registryPath.c_str(), 0, KEY_READ, &contextMenuHandlers)) == ERROR_SUCCESS)
+      // Unable to retrieve data object :-(
+    }
+    else if ((registryResult = RegOpenKeyEx(HKEY_CLASSES_ROOT, registryPath.c_str(), 0, KEY_READ, &contextMenuHandlers)) != ERROR_SUCCESS)
+    {
+      // Unable to open registry :-(
+    }
+    else if ((registryResult = RegQueryInfoKey(contextMenuHandlers, NULL, NULL, NULL, &numberOfSubKey, &subKeyMaxLength, NULL, NULL, NULL, NULL, NULL, NULL)) != ERROR_SUCCESS)
+    {
+      // Unable to read registry keys :-(
+    }
+    else
+    {
+      // Loop over subkeys in reverse order because menu entries are always added at the beginning
+      // If reverse order is not used, the menu order differs from the order shown in the explorer
+      while (numberOfSubKey > 0)
       {
-        DWORD numberOfSubKey = 0;
-        DWORD subKeyMaxLength = 0;
-        if ((registryResult = RegQueryInfoKey(contextMenuHandlers, NULL, NULL, NULL, &numberOfSubKey, &subKeyMaxLength, NULL, NULL, NULL, NULL, NULL, NULL)) == ERROR_SUCCESS)
+        numberOfSubKey--;
+        DWORD keyIndex = numberOfSubKey;
+        wchar_t registryValue[255];
+        DWORD bufferLength = sizeof(registryValue);
+
+        DWORD numberOfReadBytes = subKeyMaxLength + 1;
+        wchar_t* registryKeyName = new wchar_t[numberOfReadBytes];
+
+        if ((registryResult = RegEnumKeyEx(contextMenuHandlers, keyIndex, registryKeyName, &numberOfReadBytes, NULL, NULL, NULL, NULL)) != ERROR_SUCCESS)
         {
-          // Loop over subkeys in reverse order because menu entries are always added at the beginning
-          // If reverse order is not used, the menu order differs from the order shown in the explorer
-          while (numberOfSubKey > 0)
+          // Unable to enumerate registry keys :-(
+        }
+        else if ((registryResult = RegGetValue(contextMenuHandlers, registryKeyName, NULL, RRF_RT_REG_SZ, NULL, registryValue, &bufferLength)) != ERROR_SUCCESS)
+        {
+          // Unable to get registry value :-(
+        }
+        else
+        {
+          // Convert string to CLSID. As some plugins use the registry key name for the ID and some use the registry value, try both
+          GUID CLSID_NewMenu;
+          if (SUCCEEDED(result = CLSIDFromString(registryValue, &CLSID_NewMenu)))
           {
-            numberOfSubKey--;
-            DWORD keyIndex = numberOfSubKey;
-            DWORD numberOfReadBytes = subKeyMaxLength + 1;
-            wchar_t* registryKeyName = new wchar_t[numberOfReadBytes];
-            if ((registryResult = RegEnumKeyEx(contextMenuHandlers, keyIndex, registryKeyName, &numberOfReadBytes, NULL, NULL, NULL, NULL)) == ERROR_SUCCESS)
+          }
+          else if (SUCCEEDED(result = CLSIDFromString(registryKeyName, &CLSID_NewMenu)))
+          {
+          }
+
+          if (SUCCEEDED(result))
+          {
+            IShellExtInit* shellExtInit;
+            if (FAILED(result = CoCreateInstance(CLSID_NewMenu, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellExtInit))))
             {
-              wchar_t registryValue[255];
-              DWORD bufferLength = sizeof(registryValue);
-              if ((registryResult = RegGetValue(contextMenuHandlers, registryKeyName, NULL, RRF_RT_REG_SZ, NULL, registryValue, &bufferLength)) == ERROR_SUCCESS)
+              // Failed to create an IShellExtInit instance :-(
+            }
+            else if (FAILED(result = shellExtInit->Initialize(NULL, dataObject, NULL)))
+            {
+              // Failed to initialied the shell extension
+            }
+            else
+            {
+              IContextMenu* contextMenu;
+              if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_IContextMenu3, (void**)&(contextMenu))))
               {
-                // Convert string to CLSID. As some plugins use the registry key name for the ID and some use the registry value, try both
-                GUID CLSID_NewMenu;
-                if (SUCCEEDED(result = CLSIDFromString(registryValue, &CLSID_NewMenu)))
-                {
-                }
-                else if (SUCCEEDED(result = CLSIDFromString(registryKeyName, &CLSID_NewMenu)))
-                {
-                }
-
-                if (SUCCEEDED(result))
-                {
-                  IShellExtInit* shellExtInit;
-                  if (SUCCEEDED(result = CoCreateInstance(CLSID_NewMenu, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellExtInit))))
-                  {
-                    if (SUCCEEDED(result = shellExtInit->Initialize(NULL, dataObject, NULL)))
-                    {
-                      IContextMenu* contextMenu;
-                      if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_IContextMenu3, (void**)&(contextMenu))))
-                      {
-                      }
-                      else if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_IContextMenu2, (void**)&(contextMenu))))
-                      {
-                      }
-                      else if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_IContextMenu, (void**)&(contextMenu))))
-                      {
-                      }
-
-                      if (SUCCEEDED(result))
-                      {
-                        this->GetMenuData(contextMenu, CMF_NORMAL);
-                      }
-
-                      shellExtInit->Release();
-                    }
-                  }
-                }
               }
+              else if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_IContextMenu2, (void**)&(contextMenu))))
+              {
+              }
+              else if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_IContextMenu, (void**)&(contextMenu))))
+              {
+              }
+
+              if (SUCCEEDED(result))
+              {
+                this->GetMenuData(contextMenu, CMF_NORMAL);
+              }
+
+              shellExtInit->Release();
             }
           }
         }
 
-        RegCloseKey(contextMenuHandlers);
+        delete[] registryKeyName;
       }
     }
+ 
 
+    if (contextMenuHandlers != nullptr)
+    {
+      RegCloseKey(contextMenuHandlers);
+    }
     return result;
   }
 }
