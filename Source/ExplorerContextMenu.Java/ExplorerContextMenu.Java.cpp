@@ -29,6 +29,7 @@
 #include "ExplorerContextMenu.h"
 #include "JavaExplorerContextMenuEntry.h"
 #include "explorercontextmenu_menu_ExplorerContextMenu.h"
+#include "explorercontextmenu_menu_ExplorerContextMenuEntry.h"
 
 using namespace std;
 using namespace ContextQuickie;
@@ -77,11 +78,13 @@ JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenu_getEntr
   wrapper.CopyEntries(*Java_explorercontextmenu_menu_ExplorerContextMenu_Menu);
 }
 
-JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenu_executeCommand(JNIEnv* env, jobject instance, jint commandId)
+JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenuEntry_executeCommand(JNIEnv* env, jobject instance, jint commandId)
 {
-  if (Java_explorercontextmenu_menu_ExplorerContextMenu_Menu != nullptr)
+  JavaExplorerContextMenuEntry javaEntry(env, instance);
+  ExplorerContextMenuEntry* entry = javaEntry.GetNativeHandle();
+  if (entry != nullptr)
   {
-    Java_explorercontextmenu_menu_ExplorerContextMenu_Menu->ExecuteCommand();
+    entry->ExecuteCommand();
   }
 }
 

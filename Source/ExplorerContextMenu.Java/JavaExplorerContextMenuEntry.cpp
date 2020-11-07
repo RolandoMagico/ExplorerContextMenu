@@ -72,21 +72,22 @@ JavaExplorerContextMenuEntry::JavaExplorerContextMenuEntry(JNIEnv* environment, 
   this->javaInstace = javaInstance;
 }
 
-JavaExplorerContextMenuEntry::JavaExplorerContextMenuEntry(JNIEnv* environment, ExplorerContextMenuEntry& entry)
+JavaExplorerContextMenuEntry::JavaExplorerContextMenuEntry(JNIEnv* environment, ExplorerContextMenuEntry* entry)
   : JavaExplorerContextMenuEntry(environment)
 {
-  if (entry.Text != nullptr)
+  if (entry->Text != nullptr)
   {
-    this->SetText(*(entry.Text));
+    this->SetText(*(entry->Text));
   }
 
-  if (entry.BitmapHandle != nullptr)
+  if (entry->BitmapHandle != nullptr)
   {
-    this->SetImageHandle(entry.BitmapHandle);
+    this->SetImageHandle(entry->BitmapHandle);
   }
 
-  this->SetCommandId(entry.CommandId);
-  this->SetSeperator(entry.IsSeparator);
+  this->SetNativeHandle(entry);
+  this->SetCommandId(entry->CommandId);
+  this->SetSeperator(entry->IsSeparator);
 }
 
 void JavaExplorerContextMenuEntry::CopyEntries(ExplorerContextMenuEntry& entry)
@@ -127,6 +128,27 @@ void JavaExplorerContextMenuEntry::SetCommandId(int32_t value)
 void JavaExplorerContextMenuEntry::SetImageHandle(uint32_t* value)
 {
   jmethodID setterMethod = this->javaEnvironment->GetMethodID(this->javaClass, "setImageHandle", "(J)V");
+  if (setterMethod != nullptr)
+  {
+    this->javaEnvironment->CallVoidMethod(this->javaInstace, setterMethod, value);
+  }
+}
+
+ExplorerContextMenuEntry* JavaExplorerContextMenuEntry::GetNativeHandle()
+{
+  ExplorerContextMenuEntry* result = nullptr;
+  jmethodID getterMethod = this->javaEnvironment->GetMethodID(this->javaClass, "getNativeHandle", "()J");
+  if (getterMethod != nullptr)
+  {
+    result = (ExplorerContextMenuEntry*)this->javaEnvironment->CallLongMethod(this->javaInstace, getterMethod);
+  }
+
+  return result;
+}
+
+void JavaExplorerContextMenuEntry::SetNativeHandle(ExplorerContextMenuEntry* value)
+{
+  jmethodID setterMethod = this->javaEnvironment->GetMethodID(this->javaClass, "setNativeHandle", "(J)V");
   if (setterMethod != nullptr)
   {
     this->javaEnvironment->CallVoidMethod(this->javaInstace, setterMethod, value);

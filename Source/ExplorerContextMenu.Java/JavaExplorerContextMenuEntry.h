@@ -44,11 +44,13 @@ namespace ContextQuickie
   public:
     JavaExplorerContextMenuEntry(JNIEnv* environment, bool createInstance = true);
     JavaExplorerContextMenuEntry(JNIEnv* environment, jobject javaInstance);
-    JavaExplorerContextMenuEntry(JNIEnv* environment, ExplorerContextMenuEntry& entry);
+    JavaExplorerContextMenuEntry(JNIEnv* environment, ExplorerContextMenuEntry* entry);
     void CopyEntries(ExplorerContextMenuEntry& entry);
     void SetText(wstring& value);
     void SetCommandId(int32_t value);
     void SetImageHandle(uint32_t* value);
+    ExplorerContextMenuEntry* GetNativeHandle();
+    void SetNativeHandle(ExplorerContextMenuEntry* value);
     void SetSeperator(bool value);
     void AddEntry(JavaExplorerContextMenuEntry& value);
   };

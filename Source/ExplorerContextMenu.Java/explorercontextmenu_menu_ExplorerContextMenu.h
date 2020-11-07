@@ -15,14 +15,6 @@ extern "C" {
 JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenu_getEntries
   (JNIEnv *, jobject, jobjectArray);
 
-/*
- * Class:     explorercontextmenu_menu_ExplorerContextMenu
- * Method:    executeCommand
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenu_executeCommand
-  (JNIEnv *, jobject, jint);
-
 #ifdef __cplusplus
 }
 #endif
