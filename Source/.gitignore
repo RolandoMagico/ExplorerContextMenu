@@ -8,4 +8,5 @@
 /ExplorerContextMenu*/bin/Release/*/*.ipdb
 /ExplorerContextMenu*/bin/Release/*/*.lib
 /ExplorerContextMenu*/bin/Release/*/*.pdb
+/ExplorerContextMenu*/bin/Release/*/*.metagen
 /ExplorerContextMenu.Java/**/*.class
