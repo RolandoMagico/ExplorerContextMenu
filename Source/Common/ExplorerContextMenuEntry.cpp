@@ -68,6 +68,91 @@ namespace ContextQuickie
     this->Text = nullptr;
   }
 
+  ExplorerContextMenuEntry::ExplorerContextMenuEntry(IContextMenu* contextMenu, HMENU menu, int32_t index)
+    : ExplorerContextMenuEntry()
+  {
+    this->ContextMenu = contextMenu;
+    MENUITEMINFO menuInfo;
+
+    menuInfo.fMask = MIIM_STRING;
+    menuInfo.cbSize = sizeof(MENUITEMINFO);
+    menuInfo.dwTypeData = nullptr;
+    if ((GetMenuItemInfo(menu, index, true, &menuInfo) == TRUE) && (menuInfo.cch != 0))
+    {
+      menuInfo.cch++;
+      wchar_t* buffer = new wchar_t[menuInfo.cch];
+      menuInfo.dwTypeData = buffer;
+      if (GetMenuItemInfo(menu, index, true, &menuInfo) == TRUE)
+      {
+        this->Text = new wstring(buffer);
+      }
+      else
+      {
+        /* TODO: Error handling if the text cannot be retrieved */
+      }
+
+      delete[] buffer;
+    }
+    else
+    {
+      /* TODO: Error handling if the text cannot be retrieved */
+    }
+
+    menuInfo.fMask = MIIM_FTYPE;
+    menuInfo.cbSize = sizeof(MENUITEMINFO);
+    if (GetMenuItemInfo(menu, index, true, &menuInfo) == false)
+    {
+      /* TODO: Error handling if the type cannot be retrieved */
+    }
+    else if (menuInfo.fType == MFT_SEPARATOR)
+    {
+      this->IsSeparator = true;
+    }
+    else
+    {
+      this->IsSeparator = false;
+    }
+
+    menuInfo.fMask = MIIM_ID;
+    menuInfo.cbSize = sizeof(MENUITEMINFO);
+    if (GetMenuItemInfo(menu, index, true, &menuInfo) == false)
+    {
+      /* TODO: Error handling if the type cannot be retrieved */
+    }
+    else
+    {
+      this->CommandId = menuInfo.wID;
+    }
+
+    menuInfo.fMask = MIIM_BITMAP;
+    menuInfo.cbSize = sizeof(MENUITEMINFO);
+    if (GetMenuItemInfo(menu, index, true, &menuInfo) == false)
+    {
+      /* TODO: Error handling if the text cannot be retrieved */
+    }
+    else if (menuInfo.hbmpItem != nullptr)
+    {
+      BITMAP bitMap;
+      if (GetObject(menuInfo.hbmpItem, sizeof(BITMAP), &bitMap) != 0)
+      {
+        this->BitmapHandle = (uint32_t*)menuInfo.hbmpItem;
+        this->BitmapWidth = bitMap.bmWidth;
+        this->BitmapHeight = bitMap.bmHeight;
+      }
+    }
+
+    menuInfo.fMask = MIIM_SUBMENU;
+    menuInfo.cbSize = sizeof(MENUITEMINFO);
+    if (GetMenuItemInfo(menu, index, true, &menuInfo) == false)
+    {
+      /* TODO: Error handling if the text cannot be retrieved */
+    }
+    else if (menuInfo.hSubMenu != nullptr)
+    {
+      this->AddEntries(contextMenu, menuInfo.hSubMenu, true);
+    }
+  }
+
   ExplorerContextMenuEntry::~ExplorerContextMenuEntry()
   {
     for (size_t entryIndex = 0; entryIndex < this->menuEntries.size(); entryIndex++)
@@ -81,97 +166,24 @@ namespace ContextQuickie
     }
   }
 
-  void ExplorerContextMenuEntry::GetMenuData(HMENU menu)
+  void ExplorerContextMenuEntry::AddEntries(IContextMenu* contextMenu, HMENU menu, bool isDefaultMenu)
   {
     int menuItemCount = GetMenuItemCount(menu);
 
+    vector<ExplorerContextMenuEntry*> createdEntries;
     for (uint32_t menuIndex = 0; menuIndex < (uint32_t)menuItemCount; menuIndex++)
     {
-      ExplorerContextMenuEntry* entry = new ExplorerContextMenuEntry();
-      this->menuEntries.push_back(entry);
+      ExplorerContextMenuEntry* entry = new ExplorerContextMenuEntry(contextMenu, menu, menuIndex);
+      createdEntries.push_back(entry);
+    }
 
-      MENUITEMINFO menuInfo;
-
-      menuInfo.fMask = MIIM_STRING;
-      menuInfo.cbSize = sizeof(MENUITEMINFO);
-      menuInfo.dwTypeData = nullptr;
-      if ((GetMenuItemInfo(menu, menuIndex, true, &menuInfo) == TRUE) && (menuInfo.cch != 0))
-      {
-        menuInfo.cch++;
-        wchar_t* buffer = new wchar_t[menuInfo.cch];
-        menuInfo.dwTypeData = buffer;
-        if (GetMenuItemInfo(menu, menuIndex, true, &menuInfo) == TRUE)
-        {
-          entry->Text = new wstring(buffer);
-        }
-        else
-        {
-          /* TODO: Error handling if the text cannot be retrieved */
-        }
-
-        delete[] buffer;
-      }
-      else
-      {
-        /* TODO: Error handling if the text cannot be retrieved */
-      }
-
-      menuInfo.fMask = MIIM_FTYPE;
-      menuInfo.cbSize = sizeof(MENUITEMINFO);
-      if (GetMenuItemInfo(menu, menuIndex, true, &menuInfo) == false)
-      {
-        /* TODO: Error handling if the type cannot be retrieved */
-      }
-      else if (menuInfo.fType == MFT_SEPARATOR)
-      {
-        entry->IsSeparator = true;
-      }
-      else
-      {
-        entry->IsSeparator = false;
-      }
-
-      menuInfo.fMask = MIIM_ID;
-      menuInfo.cbSize = sizeof(MENUITEMINFO);
-      if (GetMenuItemInfo(menu, menuIndex, true, &menuInfo) == false)
-      {
-        /* TODO: Error handling if the type cannot be retrieved */
-      }
-      else
-      {
-        entry->CommandId = menuInfo.wID;
-      }
-
-      menuInfo.fMask = MIIM_BITMAP;
-      menuInfo.cbSize = sizeof(MENUITEMINFO);
-      entry->BitmapHandle = nullptr;
-      entry->BitmapWidth = 0;
-      entry->BitmapHeight = 0;
-      if (GetMenuItemInfo(menu, menuIndex, true, &menuInfo) == false)
-      {
-        /* TODO: Error handling if the text cannot be retrieved */
-      }
-      else if (menuInfo.hbmpItem != nullptr)
-      {
-        BITMAP bitMap;
-        if (GetObject(menuInfo.hbmpItem, sizeof(BITMAP), &bitMap) != 0)
-        {
-          entry->BitmapHandle = (uint32_t*)menuInfo.hbmpItem;
-          entry->BitmapWidth = bitMap.bmWidth;
-          entry->BitmapHeight = bitMap.bmHeight;
-        }
-      }
-
-      menuInfo.fMask = MIIM_SUBMENU;
-      menuInfo.cbSize = sizeof(MENUITEMINFO);
-      if (GetMenuItemInfo(menu, menuIndex, true, &menuInfo) == false)
-      {
-        /* TODO: Error handling if the text cannot be retrieved */
-      }
-      else if (menuInfo.hSubMenu != nullptr)
-      {
-        entry->GetMenuData(menuInfo.hSubMenu);
-      }
+    if ((isDefaultMenu == true))
+    {
+      this->menuEntries.insert(this->menuEntries.cend(), createdEntries.begin(), createdEntries.end());
+    }
+    else if (createdEntries.empty() == false)
+    {
+      this->menuEntries.insert(this->menuEntries.begin() + 1, createdEntries.begin(), createdEntries.end());
     }
   }
 
@@ -184,7 +196,8 @@ namespace ContextQuickie
     HMENU menu = CreatePopupMenu();
     if (SUCCEEDED(contextMenu->QueryContextMenu(menu, 0, 0, UINT_MAX, flags)))
     {
-      this->GetMenuData(menu);
+      bool isDefaultMenu = ((flags & CMF_DEFAULTONLY) == CMF_DEFAULTONLY);
+      this->AddEntries(contextMenu, menu, isDefaultMenu);
     }
 
     DestroyMenu(menu);

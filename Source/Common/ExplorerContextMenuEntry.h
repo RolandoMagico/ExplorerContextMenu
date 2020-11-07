@@ -40,6 +40,7 @@ namespace ContextQuickie
   {
   private:
     IContextMenu* ContextMenu = nullptr;
+    void AddEntries(IContextMenu* contextMenu, HMENU menu, bool isDefaultMenu);
 
   public:
     wstring* Text;
@@ -50,9 +51,9 @@ namespace ContextQuickie
     uint32_t* BitmapHandle;
     vector<ExplorerContextMenuEntry*> menuEntries;
     ExplorerContextMenuEntry();
+    ExplorerContextMenuEntry(IContextMenu* contextMenu, HMENU menu, int32_t index);
     ~ExplorerContextMenuEntry();
     size_t GetAllEntriesCount();
-    void GetMenuData(HMENU menu);
     void GetMenuData(IContextMenu* contextMenu, uint32_t flags);
     void ExecuteCommand();
     void PrintMenu(uint32_t level = 0);

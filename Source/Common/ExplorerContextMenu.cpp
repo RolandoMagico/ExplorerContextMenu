@@ -90,6 +90,7 @@ namespace ContextQuickie
             defaultContextMenu.apidl = (LPCITEMIDLIST*)itemIdList;
 
             IContextMenu* contextMenu;
+
             if (SUCCEEDED(result = SHCreateDefaultContextMenu(&defaultContextMenu, IID_IContextMenu3, (void**)&(contextMenu))))
             {
             }
@@ -118,28 +119,30 @@ namespace ContextQuickie
               DWORD subKeyMaxLength = 0;
               if ((registryResult = RegQueryInfoKey(contextMenuHandlers, NULL, NULL, NULL, &numberOfSubKey, &subKeyMaxLength, NULL, NULL, NULL, NULL, NULL, NULL)) == ERROR_SUCCESS)
               {
-                for (DWORD keyIndex = 0; keyIndex < numberOfSubKey; keyIndex++)
+                while (numberOfSubKey > 0)
                 {
-                  wchar_t* buffer = new wchar_t[subKeyMaxLength + 1];
+                  numberOfSubKey--;
+                  DWORD keyIndex = numberOfSubKey;
                   DWORD numberOfReadBytes = subKeyMaxLength + 1;
-                  if ((registryResult = RegEnumKeyEx(contextMenuHandlers, keyIndex, buffer, &numberOfReadBytes, NULL, NULL, NULL, NULL)) == ERROR_SUCCESS)
+                  wchar_t* registryKeyName = new wchar_t[numberOfReadBytes];
+                  if ((registryResult = RegEnumKeyEx(contextMenuHandlers, keyIndex, registryKeyName, &numberOfReadBytes, NULL, NULL, NULL, NULL)) == ERROR_SUCCESS)
                   {
-                    wprintf(L"%ls\n", buffer);
-                    wchar_t buffer2[255];
-                    DWORD bufferLength = sizeof(buffer2);
-                    if ((registryResult = RegGetValue(contextMenuHandlers, buffer, NULL, RRF_RT_REG_SZ, NULL, buffer2, &bufferLength)) == ERROR_SUCCESS)
+                    wchar_t registryValue[255];
+                    DWORD bufferLength = sizeof(registryValue);
+                    if ((registryResult = RegGetValue(contextMenuHandlers, registryKeyName, NULL, RRF_RT_REG_SZ, NULL, registryValue, &bufferLength)) == ERROR_SUCCESS)
                     {
-                      wprintf(L"%ls\n", buffer2);
-                      IShellExtInit* shellExtInit;
+                      // Convert string to CLSID. As some plugins use the registry key name for the ID and some use the registry value, try both
                       GUID CLSID_NewMenu;
-                      if (SUCCEEDED(result = CLSIDFromString(buffer2, &CLSID_NewMenu)))
+                      if (SUCCEEDED(result = CLSIDFromString(registryValue, &CLSID_NewMenu)))
                       {
                       }
-                      else if (SUCCEEDED(result = CLSIDFromString(buffer, &CLSID_NewMenu)))
+                      else if (SUCCEEDED(result = CLSIDFromString(registryKeyName, &CLSID_NewMenu)))
                       {
                       }
+
                       if (SUCCEEDED(result))
                       {
+                        IShellExtInit* shellExtInit;
                         if (SUCCEEDED(result = CoCreateInstance(CLSID_NewMenu, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellExtInit))))
                         {
                           if (SUCCEEDED(result = shellExtInit->Initialize(NULL, dataObject, NULL)))
