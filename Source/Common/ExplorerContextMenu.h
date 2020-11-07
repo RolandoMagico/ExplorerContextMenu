@@ -42,8 +42,8 @@ namespace ContextQuickie
   class ExplorerContextMenu : public ExplorerContextMenuEntry
   {
   private:
-    static HWND GetCurrentWindowHandle();
-    static uint32_t GetNumberOfEntries(HMENU menu);
+    HRESULT GetDefaultContextMenu(IShellFolder* desktop, LPCITEMIDLIST* itemIdList, UINT itemIdListLength);
+    HRESULT GetExtendedContextMenu(IShellFolder* desktop, LPCITEMIDLIST* itemIdList, UINT itemIdListLength);
 
   public:
     ExplorerContextMenu(vector<wstring> paths);

@@ -58,165 +58,167 @@ namespace ContextQuickie
   ExplorerContextMenu::ExplorerContextMenu(vector<wstring> paths)
   {
     HRESULT result = S_OK;
+    IShellFolder* desktop = nullptr;
+    ITEMIDLIST** itemIdList = nullptr;
 
     if (paths.empty())
     {
-      /* Nothing to do if an empty list ist passed */
+      // Nothing to do if an empty list ist passed
     }
     else if (paths.size() > UINT_MAX)
     {
-      /* Too many items, cannot handle that */
+      // Too many items, cannot handle that :-(
     }
-    else if (SUCCEEDED(result = CoInitialize(nullptr)))
+    else if (FAILED(result = CoInitialize(nullptr)))
     {
-      IShellFolder* desktop = nullptr;
-      if (SUCCEEDED(result = SHGetDesktopFolder(&desktop)))
+      // Nothing to do here, CoInitialize failed :-(
+    }
+    else if (FAILED(result = SHGetDesktopFolder(&desktop)))
+    {
+      // Unable to retrive desktop opbject :-(
+    }
+    else
+    {
+      itemIdList = new ITEMIDLIST * [paths.size()];
+      for (size_t pathIndex = 0; (pathIndex < paths.size()) && SUCCEEDED(result); pathIndex++)
       {
-        ITEMIDLIST** itemIdList = new ITEMIDLIST * [paths.size()];
-        for (size_t pathIndex = 0; (pathIndex < paths.size()) && SUCCEEDED(result); pathIndex++)
+        result = desktop->ParseDisplayName(NULL, NULL, (LPWSTR)paths[pathIndex].c_str(), nullptr, &(itemIdList[pathIndex]), NULL);
+      }
+    }
+
+    if (SUCCEEDED(result))
+    {
+      LPCITEMIDLIST* itemIdListArg = (LPCITEMIDLIST*)itemIdList;
+      UINT itemIdListLength = (UINT)paths.size();
+      if (FAILED(result = this->GetDefaultContextMenu(desktop, itemIdListArg, itemIdListLength)))
+      {
+        // Something went wrong when creating the default menu
+      }
+      else if (FAILED(result = this->GetExtendedContextMenu(desktop, itemIdListArg, itemIdListLength)))
+      {
+        // Something went wrong when creating the exteneded menu
+      }
+      else
+      {
+        this->RemoveDuplicateSeparators();
+      }
+    }
+
+    if (desktop != nullptr)
+    {
+      desktop->Release();
+    }
+
+    if (itemIdList != nullptr)
+    {
+      delete[] itemIdList;
+    }
+  }
+
+  HRESULT ExplorerContextMenu::GetDefaultContextMenu(IShellFolder* desktop, LPCITEMIDLIST* itemIdList, UINT itemIdListLength)
+  {
+    HRESULT result = S_OK;
+    DEFCONTEXTMENU defaultContextMenu = { 0 };
+    defaultContextMenu.hwnd = NULL;
+    defaultContextMenu.psf = desktop;
+    defaultContextMenu.cidl = itemIdListLength;
+    defaultContextMenu.apidl = itemIdList;
+
+    IContextMenu* contextMenu;
+
+    if (SUCCEEDED(result = SHCreateDefaultContextMenu(&defaultContextMenu, IID_IContextMenu3, (void**)&(contextMenu))))
+    {
+    }
+    else if (SUCCEEDED(result = SHCreateDefaultContextMenu(&defaultContextMenu, IID_IContextMenu2, (void**)&(contextMenu))))
+    {
+    }
+    else if (SUCCEEDED(result = SHCreateDefaultContextMenu(&defaultContextMenu, IID_IContextMenu, (void**)&(contextMenu))))
+    {
+    }
+
+    if (SUCCEEDED(result))
+    {
+      this->GetMenuData(contextMenu, CMF_DEFAULTONLY);
+    }
+
+    return result;
+  }
+
+  HRESULT ExplorerContextMenu::GetExtendedContextMenu(IShellFolder* desktop, LPCITEMIDLIST* itemIdList, UINT itemIdListLength)
+  {
+    HRESULT result = S_OK;
+    IDataObject* dataObject;
+    if (SUCCEEDED(result = desktop->GetUIObjectOf(NULL, itemIdListLength, itemIdList, IID_IDataObject, NULL, (void**)&dataObject)))
+    {
+      LSTATUS registryResult;
+      HKEY contextMenuHandlers = nullptr;
+      wstring registryPath(L"*\\shellex\\ContextMenuHandlers");
+      if ((registryResult = RegOpenKeyEx(HKEY_CLASSES_ROOT, registryPath.c_str(), 0, KEY_READ, &contextMenuHandlers)) == ERROR_SUCCESS)
+      {
+        DWORD numberOfSubKey = 0;
+        DWORD subKeyMaxLength = 0;
+        if ((registryResult = RegQueryInfoKey(contextMenuHandlers, NULL, NULL, NULL, &numberOfSubKey, &subKeyMaxLength, NULL, NULL, NULL, NULL, NULL, NULL)) == ERROR_SUCCESS)
         {
-          result = desktop->ParseDisplayName(NULL, NULL, (LPWSTR)paths[pathIndex].c_str(), nullptr, &(itemIdList[pathIndex]), NULL);
-        }
-
-        if (SUCCEEDED(result))
-        {
-          HWND windowHandle = GetCurrentWindowHandle();
-          if (windowHandle != nullptr)
+          // Loop over subkeys in reverse order because menu entries are always added at the beginning
+          // If reverse order is not used, the menu order differs from the order shown in the explorer
+          while (numberOfSubKey > 0)
           {
-            DEFCONTEXTMENU defaultContextMenu = { 0 };
-            defaultContextMenu.hwnd = windowHandle;
-            defaultContextMenu.psf = desktop;
-            defaultContextMenu.cidl = (UINT)paths.size();
-            defaultContextMenu.apidl = (LPCITEMIDLIST*)itemIdList;
-
-            IContextMenu* contextMenu;
-
-            if (SUCCEEDED(result = SHCreateDefaultContextMenu(&defaultContextMenu, IID_IContextMenu3, (void**)&(contextMenu))))
+            numberOfSubKey--;
+            DWORD keyIndex = numberOfSubKey;
+            DWORD numberOfReadBytes = subKeyMaxLength + 1;
+            wchar_t* registryKeyName = new wchar_t[numberOfReadBytes];
+            if ((registryResult = RegEnumKeyEx(contextMenuHandlers, keyIndex, registryKeyName, &numberOfReadBytes, NULL, NULL, NULL, NULL)) == ERROR_SUCCESS)
             {
-            }
-            else if (SUCCEEDED(result = SHCreateDefaultContextMenu(&defaultContextMenu, IID_IContextMenu2, (void**)&(contextMenu))))
-            {
-            }
-            else if (SUCCEEDED(result = SHCreateDefaultContextMenu(&defaultContextMenu, IID_IContextMenu, (void**)&(contextMenu))))
-            {
-            }
-
-            if (SUCCEEDED(result))
-            {
-              this->GetMenuData(contextMenu, CMF_DEFAULTONLY);
-            }
-          }
-
-          IDataObject* dataObject;
-          if (SUCCEEDED(result = desktop->GetUIObjectOf(windowHandle, (UINT)paths.size(), (LPCITEMIDLIST*)itemIdList, IID_IDataObject, NULL, (void**)&dataObject)))
-          {
-            LSTATUS registryResult;
-            HKEY contextMenuHandlers = nullptr;
-            wstring registryPath(L"*\\shellex\\ContextMenuHandlers");
-            if ((registryResult = RegOpenKeyEx(HKEY_CLASSES_ROOT, registryPath.c_str(), 0, KEY_READ, &contextMenuHandlers)) == ERROR_SUCCESS)
-            {
-              DWORD numberOfSubKey = 0;
-              DWORD subKeyMaxLength = 0;
-              if ((registryResult = RegQueryInfoKey(contextMenuHandlers, NULL, NULL, NULL, &numberOfSubKey, &subKeyMaxLength, NULL, NULL, NULL, NULL, NULL, NULL)) == ERROR_SUCCESS)
+              wchar_t registryValue[255];
+              DWORD bufferLength = sizeof(registryValue);
+              if ((registryResult = RegGetValue(contextMenuHandlers, registryKeyName, NULL, RRF_RT_REG_SZ, NULL, registryValue, &bufferLength)) == ERROR_SUCCESS)
               {
-                while (numberOfSubKey > 0)
+                // Convert string to CLSID. As some plugins use the registry key name for the ID and some use the registry value, try both
+                GUID CLSID_NewMenu;
+                if (SUCCEEDED(result = CLSIDFromString(registryValue, &CLSID_NewMenu)))
                 {
-                  numberOfSubKey--;
-                  DWORD keyIndex = numberOfSubKey;
-                  DWORD numberOfReadBytes = subKeyMaxLength + 1;
-                  wchar_t* registryKeyName = new wchar_t[numberOfReadBytes];
-                  if ((registryResult = RegEnumKeyEx(contextMenuHandlers, keyIndex, registryKeyName, &numberOfReadBytes, NULL, NULL, NULL, NULL)) == ERROR_SUCCESS)
+                }
+                else if (SUCCEEDED(result = CLSIDFromString(registryKeyName, &CLSID_NewMenu)))
+                {
+                }
+
+                if (SUCCEEDED(result))
+                {
+                  IShellExtInit* shellExtInit;
+                  if (SUCCEEDED(result = CoCreateInstance(CLSID_NewMenu, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellExtInit))))
                   {
-                    wchar_t registryValue[255];
-                    DWORD bufferLength = sizeof(registryValue);
-                    if ((registryResult = RegGetValue(contextMenuHandlers, registryKeyName, NULL, RRF_RT_REG_SZ, NULL, registryValue, &bufferLength)) == ERROR_SUCCESS)
+                    if (SUCCEEDED(result = shellExtInit->Initialize(NULL, dataObject, NULL)))
                     {
-                      // Convert string to CLSID. As some plugins use the registry key name for the ID and some use the registry value, try both
-                      GUID CLSID_NewMenu;
-                      if (SUCCEEDED(result = CLSIDFromString(registryValue, &CLSID_NewMenu)))
+                      IContextMenu* contextMenu;
+                      if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_IContextMenu3, (void**)&(contextMenu))))
                       {
                       }
-                      else if (SUCCEEDED(result = CLSIDFromString(registryKeyName, &CLSID_NewMenu)))
+                      else if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_IContextMenu2, (void**)&(contextMenu))))
+                      {
+                      }
+                      else if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_IContextMenu, (void**)&(contextMenu))))
                       {
                       }
 
                       if (SUCCEEDED(result))
                       {
-                        IShellExtInit* shellExtInit;
-                        if (SUCCEEDED(result = CoCreateInstance(CLSID_NewMenu, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellExtInit))))
-                        {
-                          if (SUCCEEDED(result = shellExtInit->Initialize(NULL, dataObject, NULL)))
-                          {
-                            IContextMenu* contextMenu;
-                            if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_IContextMenu3, (void**)&(contextMenu))))
-                            {
-                            }
-                            else if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_IContextMenu2, (void**)&(contextMenu))))
-                            {
-                            }
-                            else if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_IContextMenu, (void**)&(contextMenu))))
-                            {
-                            }
-
-                            if (SUCCEEDED(result))
-                            {
-                              this->GetMenuData(contextMenu, CMF_NORMAL);
-                            }
-
-                            shellExtInit->Release();
-                          }
-                        }
+                        this->GetMenuData(contextMenu, CMF_NORMAL);
                       }
+
+                      shellExtInit->Release();
                     }
                   }
                 }
               }
-
-              RegCloseKey(contextMenuHandlers);
             }
-
-            desktop->Release();
           }
         }
+
+        RegCloseKey(contextMenuHandlers);
       }
     }
-  }
 
-  HWND ExplorerContextMenu::GetCurrentWindowHandle()
-  {
-    /* Try to get the current window handle, try to get the desktop handle first, if it doesn't work, try to get the console window handle. */
-    HWND windowHandle = nullptr;
-    windowHandle = GetDesktopWindow();
-    if (windowHandle == nullptr)
-    {
-      windowHandle = GetConsoleWindow();
-    }
-
-    return windowHandle;
-  }
-
-  uint32_t ExplorerContextMenu::GetNumberOfEntries(HMENU menu)
-  {
-    uint32_t count = 0;
-    for (int menuIndex = 0; menuIndex < GetMenuItemCount(menu); menuIndex++)
-    {
-      MENUITEMINFO menuInfo;
-
-      menuInfo.fMask = MIIM_SUBMENU;
-      menuInfo.cbSize = sizeof(MENUITEMINFO);
-      if (GetMenuItemInfo(menu, menuIndex, true, &menuInfo) == false)
-      {
-        /* TODO: Error handling if the text cannot be retrieved */
-      }
-      else if (menuInfo.hSubMenu != nullptr)
-      {
-        count += GetNumberOfEntries(menuInfo.hSubMenu);
-      }
-
-      count++;
-    }
-
-    return count;
+    return result;
   }
 }
 /***********************************************************************************************************************

@@ -57,6 +57,7 @@ namespace ContextQuickie
     void GetMenuData(IContextMenu* contextMenu, uint32_t flags);
     void ExecuteCommand();
     void PrintMenu(uint32_t level = 0);
+    void RemoveDuplicateSeparators();
   };
 }
 /***********************************************************************************************************************

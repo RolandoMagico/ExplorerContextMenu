@@ -244,4 +244,22 @@ namespace ContextQuickie
       this->menuEntries[childIndex]->PrintMenu(level + 1);
     }
   }
+
+  void ExplorerContextMenuEntry::RemoveDuplicateSeparators()
+  {
+    for (size_t childIndex = 1; childIndex < this->menuEntries.size(); childIndex++)
+    {
+      if ((this->menuEntries[childIndex]->IsSeparator == true) &&
+        (this->menuEntries[childIndex - 1]->IsSeparator == true))
+      {
+        this->menuEntries.erase(this->menuEntries.begin() + childIndex);
+      }
+    }
+
+    for (size_t childIndex = 0; childIndex < this->menuEntries.size(); childIndex++)
+    {
+      this->menuEntries[childIndex]->RemoveDuplicateSeparators();
+    }
+  }
 }
+
