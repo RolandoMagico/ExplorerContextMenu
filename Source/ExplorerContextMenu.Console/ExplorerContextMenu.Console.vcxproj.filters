@@ -21,5 +21,11 @@
     <ClInclude Include="..\Common\ExplorerContextMenuEntry.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\Common\ExplorerContextMenu.rc">
+      <Filter>Common</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

@@ -178,6 +178,9 @@
     <ClInclude Include="..\Common\ExplorerContextMenuEntry.h" />
     <ClInclude Include="JavaExplorerContextMenuEntry.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\Common\ExplorerContextMenu.rc" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

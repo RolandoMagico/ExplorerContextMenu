@@ -37,4 +37,9 @@
       <UniqueIdentifier>{c6e1a26c-6ac1-4e11-b3f9-18afe7aab35d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\Common\ExplorerContextMenu.rc">
+      <Filter>Common</Filter>
+    </ResourceCompile>
+  </ItemGroup>
 </Project>

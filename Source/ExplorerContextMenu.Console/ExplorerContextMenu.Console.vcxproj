@@ -158,6 +158,10 @@
   <ItemGroup>
     <ClInclude Include="..\Common\ExplorerContextMenu.h" />
     <ClInclude Include="..\Common\ExplorerContextMenuEntry.h" />
+    <ClInclude Include="..\Common\resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\Common\ExplorerContextMenu.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
