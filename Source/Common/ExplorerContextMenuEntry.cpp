@@ -64,7 +64,6 @@ namespace ContextQuickie
     this->BitmapHeight = 0;
     this->CommandId = 0;
     this->IsSeparator = false;
-    this->menuEntries = vector<ExplorerContextMenuEntry*>();
     this->Text = nullptr;
   }
 
@@ -72,6 +71,7 @@ namespace ContextQuickie
     : ExplorerContextMenuEntry()
   {
     this->ContextMenu = contextMenu;
+    this->ContextMenu->AddRef();
 
     wchar_t buffer[MAX_STRING_LENGTH] = { 0 };
 
@@ -131,12 +131,14 @@ namespace ContextQuickie
           UINT flags;
           memset(buffer, 0, sizeof(buffer));
           extractIcon->GetIconLocation(NULL, buffer, MAX_STRING_LENGTH, &index, &flags);
+          extractIcon->Release();
         }
       }
 
       if (menuInfo.hSubMenu != nullptr)
       {
         this->AddEntries(contextMenu, menuInfo.hSubMenu, true);
+        DestroyMenu(menuInfo.hSubMenu);
       }
     }
     else
@@ -152,6 +154,18 @@ namespace ContextQuickie
       delete this->menuEntries[entryIndex];
     }
 
+    this->menuEntries.clear();
+
+    if (this->BitmapHandle != nullptr)
+    {
+      DeleteObject((HBITMAP)this->BitmapHandle);
+    }
+
+    if (this->ContextMenu != nullptr)
+    {
+      this->ContextMenu->Release();
+    }
+
     if (this->Text != nullptr)
     {
       delete this->Text;
@@ -160,6 +174,11 @@ namespace ContextQuickie
     if (this->HelpText != nullptr)
     {
       delete this->HelpText;
+    }
+
+    if (this->CommandString != nullptr)
+    {
+      delete this->CommandString;
     }
   }
 
@@ -249,6 +268,7 @@ namespace ContextQuickie
       if ((this->menuEntries[childIndex]->IsSeparator == true) &&
         (this->menuEntries[childIndex - 1]->IsSeparator == true))
       {
+        delete this->menuEntries[childIndex];
         this->menuEntries.erase(this->menuEntries.begin() + childIndex);
       }
     }

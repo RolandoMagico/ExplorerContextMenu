@@ -55,7 +55,7 @@
 ***********************************************************************************************************************/
 namespace ContextQuickie
 {
-  ExplorerContextMenu::ExplorerContextMenu(vector<wstring> paths)
+  ExplorerContextMenu::ExplorerContextMenu(vector<wstring>& paths)
   {
     HRESULT result = S_OK;
     IShellFolder* desktop = nullptr;
@@ -147,7 +147,7 @@ namespace ContextQuickie
   HRESULT ExplorerContextMenu::GetExtendedContextMenu(IShellFolder* desktop, LPCITEMIDLIST* itemIdList, UINT itemIdListLength)
   {
     HRESULT result = S_OK;
-    IDataObject* dataObject;
+    IDataObject* dataObject = nullptr;
     LSTATUS registryResult;
     HKEY contextMenuHandlers = nullptr;
     const wstring registryPath(L"*\\shellex\\ContextMenuHandlers");
@@ -237,6 +237,10 @@ namespace ContextQuickie
       }
     }
  
+    if (dataObject != nullptr)
+    {
+      dataObject->Release();
+    }
 
     if (contextMenuHandlers != nullptr)
     {
