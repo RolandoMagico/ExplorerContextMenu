@@ -33,7 +33,7 @@
  DEFINES
 ***********************************************************************************************************************/
 #define GET_KEY_STATE_KEY_PRESSED   (0x8000u)
-
+#define MAX_STRING_LENGTH           (1024u)
 /***********************************************************************************************************************
  TYPES
 ***********************************************************************************************************************/
@@ -73,17 +73,17 @@ namespace ContextQuickie
   {
     this->ContextMenu = contextMenu;
 
-    wchar_t buffer[1024] = { 0 };
+    wchar_t buffer[MAX_STRING_LENGTH] = { 0 };
 
     // Get data from IContextMenu
     memset(buffer, 0, sizeof(buffer));
-    if (SUCCEEDED(contextMenu->GetCommandString(index, GCS_VERBW, NULL, (CHAR*)buffer, sizeof(buffer))))
+    if (SUCCEEDED(contextMenu->GetCommandString(index, GCS_VERBW, NULL, (CHAR*)buffer, MAX_STRING_LENGTH)))
     {
       this->CommandString = new wstring(buffer);
     }
 
     memset(buffer, 0, sizeof(buffer));
-    if (SUCCEEDED(contextMenu->GetCommandString(index, GCS_HELPTEXTW, NULL, (CHAR*)buffer, sizeof(buffer))))
+    if (SUCCEEDED(contextMenu->GetCommandString(index, GCS_HELPTEXTW, NULL, (CHAR*)buffer, MAX_STRING_LENGTH)))
     {
       this->HelpText = new wstring(buffer);
     }
@@ -130,7 +130,7 @@ namespace ContextQuickie
           int index;
           UINT flags;
           memset(buffer, 0, sizeof(buffer));
-          extractIcon->GetIconLocation(NULL, buffer, sizeof(buffer), &index, &flags);
+          extractIcon->GetIconLocation(NULL, buffer, MAX_STRING_LENGTH, &index, &flags);
         }
       }
 
