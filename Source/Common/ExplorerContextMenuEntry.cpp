@@ -77,19 +77,6 @@ namespace ContextQuickie
 
     wchar_t buffer[MAX_STRING_LENGTH] = { 0 };
 
-    // Get data from IContextMenu
-    memset(buffer, 0, sizeof(buffer));
-    if (SUCCEEDED(contextMenu->GetCommandString(index, GCS_VERBW, NULL, (CHAR*)buffer, MAX_STRING_LENGTH)))
-    {
-      this->CommandString = new wstring(buffer);
-    }
-
-    memset(buffer, 0, sizeof(buffer));
-    if (SUCCEEDED(contextMenu->GetCommandString(index, GCS_HELPTEXTW, NULL, (CHAR*)buffer, MAX_STRING_LENGTH)))
-    {
-      this->HelpText = new wstring(buffer);
-    }
-
     // Get data from MENUITEMINFO
     MENUITEMINFO menuInfo;
     memset(buffer, 0, sizeof(buffer));
@@ -134,6 +121,25 @@ namespace ContextQuickie
           memset(buffer, 0, sizeof(buffer));
           extractIcon->GetIconLocation(NULL, buffer, MAX_STRING_LENGTH, &index, &flags);
           extractIcon->Release();
+        }
+      }
+
+      // Get data from IContextMenu
+      memset(buffer, 0, sizeof(buffer));
+      if (SUCCEEDED(contextMenu->GetCommandString(this->CommandId, GCS_VERBW, NULL, (CHAR*)buffer, MAX_STRING_LENGTH)))
+      {
+        if (wcslen(buffer) != 0)
+        {
+          this->CommandString = new wstring(buffer);
+        }
+      }
+
+      memset(buffer, 0, sizeof(buffer));
+      if (SUCCEEDED(contextMenu->GetCommandString(this->CommandId, GCS_HELPTEXTW, NULL, (CHAR*)buffer, MAX_STRING_LENGTH)))
+      {
+        if (wcslen(buffer) != 0)
+        {
+          this->HelpText = new wstring(buffer);
         }
       }
 
