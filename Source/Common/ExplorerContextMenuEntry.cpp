@@ -103,13 +103,15 @@ namespace ContextQuickie
 
       if (menuInfo.hbmpItem != nullptr)
       {
-        BITMAP bitMap;
-        if (GetObject(menuInfo.hbmpItem, sizeof(BITMAP), &bitMap) != 0)
-        {
-          this->BitmapHandle = (uint32_t*)menuInfo.hbmpItem;
-          this->BitmapWidth = bitMap.bmWidth;
-          this->BitmapHeight = bitMap.bmHeight;
-        }
+        this->ExtractBitmapData(menuInfo.hbmpItem);
+      }
+      else if (menuInfo.hbmpUnchecked != nullptr)
+      {
+        this->ExtractBitmapData(menuInfo.hbmpUnchecked);
+      }
+      else if (menuInfo.hbmpChecked != nullptr)
+      {
+        this->ExtractBitmapData(menuInfo.hbmpChecked);
       }
       else
       {
@@ -214,6 +216,17 @@ namespace ContextQuickie
     else if (createdEntries.empty() == false)
     {
       this->menuEntries.insert(this->menuEntries.begin() + 1, createdEntries.begin(), createdEntries.end());
+    }
+  }
+
+  void ExplorerContextMenuEntry::ExtractBitmapData(HBITMAP bitmapHandle)
+  {
+    BITMAP bitMap;
+    if (GetObject(bitmapHandle, sizeof(BITMAP), &bitMap) != 0)
+    {
+      this->BitmapHandle = (uint32_t*)bitmapHandle;
+      this->BitmapWidth = bitMap.bmWidth;
+      this->BitmapHeight = bitMap.bmHeight;
     }
   }
 

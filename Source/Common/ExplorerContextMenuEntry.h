@@ -41,7 +41,7 @@ namespace ContextQuickie
   private:
     IContextMenu* ContextMenu = nullptr;
     void AddEntries(IContextMenu* contextMenu, HMENU menu, bool isDefaultMenu);
-
+    void ExtractBitmapData(HBITMAP bitmapHandle);
   public:
     wstring* Text;
     wstring* CommandString;
