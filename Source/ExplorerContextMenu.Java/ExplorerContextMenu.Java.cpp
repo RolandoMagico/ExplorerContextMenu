@@ -78,7 +78,7 @@ JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenu_getEntr
   wrapper.CopyEntries(*Java_explorercontextmenu_menu_ExplorerContextMenu_Menu);
 }
 
-JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenuEntry_executeCommand(JNIEnv* env, jobject instance, jint commandId)
+JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenuEntry_executeCommand(JNIEnv* env, jobject instance)
 {
   JavaExplorerContextMenuEntry javaEntry(env, instance);
   ExplorerContextMenuEntry* entry = javaEntry.GetNativeHandle();

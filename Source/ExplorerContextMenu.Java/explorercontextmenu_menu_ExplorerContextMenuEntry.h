@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     explorercontextmenu_menu_ExplorerContextMenuEntry
  * Method:    executeCommand
- * Signature: (I)V
+ * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenuEntry_executeCommand
-  (JNIEnv *, jobject, jint);
+  (JNIEnv *, jobject);
 
 #ifdef __cplusplus
 }
