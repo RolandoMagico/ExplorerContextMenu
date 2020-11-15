@@ -47,6 +47,7 @@ namespace ContextQuickie
     JavaExplorerContextMenuEntry(JNIEnv* environment, ExplorerContextMenuEntry* entry);
     void CopyEntries(ExplorerContextMenuEntry& entry);
     void SetText(wstring& value);
+    void SetHelpText(wstring& value);
     void SetCommandId(int32_t value);
     void SetImageHandle(uint32_t* value);
     ExplorerContextMenuEntry* GetNativeHandle();

@@ -80,6 +80,11 @@ JavaExplorerContextMenuEntry::JavaExplorerContextMenuEntry(JNIEnv* environment, 
     this->SetText(*(entry->Text));
   }
 
+  if (entry->HelpText != nullptr)
+  {
+    this->SetHelpText(*(entry->HelpText));
+  }
+
   if (entry->BitmapHandle != nullptr)
   {
     this->SetImageHandle(entry->BitmapHandle);
@@ -109,6 +114,16 @@ jobject JavaExplorerContextMenuEntry::CreateInstance()
 void JavaExplorerContextMenuEntry::SetText(wstring& value)
 {
   jmethodID setterMethod = this->javaEnvironment->GetMethodID(this->javaClass, "setText", "(Ljava/lang/String;)V");
+  if (setterMethod != nullptr)
+  {
+    jstring jValue = this->javaEnvironment->NewString((jchar*)(value.c_str()), (jsize)(value.length()));
+    this->javaEnvironment->CallVoidMethod(this->javaInstace, setterMethod, jValue);
+  }
+}
+
+void JavaExplorerContextMenuEntry::SetHelpText(wstring& value)
+{
+  jmethodID setterMethod = this->javaEnvironment->GetMethodID(this->javaClass, "setHelpText", "(Ljava/lang/String;)V");
   if (setterMethod != nullptr)
   {
     jstring jValue = this->javaEnvironment->NewString((jchar*)(value.c_str()), (jsize)(value.length()));
