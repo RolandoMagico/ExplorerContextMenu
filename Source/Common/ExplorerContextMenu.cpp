@@ -98,10 +98,8 @@ namespace ContextQuickie
       {
         // Something went wrong when creating the exteneded menu
       }
-      else
-      {
-        this->RemoveDuplicateSeparators();
-      }
+
+      this->RemoveDuplicateSeparators();
     }
 
     if (desktop != nullptr)
@@ -126,17 +124,7 @@ namespace ContextQuickie
 
     IContextMenu* contextMenu;
 
-    if (SUCCEEDED(result = SHCreateDefaultContextMenu(&defaultContextMenu, IID_IContextMenu3, (void**)&(contextMenu))))
-    {
-    }
-    else if (SUCCEEDED(result = SHCreateDefaultContextMenu(&defaultContextMenu, IID_IContextMenu2, (void**)&(contextMenu))))
-    {
-    }
-    else if (SUCCEEDED(result = SHCreateDefaultContextMenu(&defaultContextMenu, IID_IContextMenu, (void**)&(contextMenu))))
-    {
-    }
-
-    if (SUCCEEDED(result))
+    if (SUCCEEDED(result = SHCreateDefaultContextMenu(&defaultContextMenu, IID_PPV_ARGS(&contextMenu))))
     {
       this->GetMenuData(contextMenu, CMF_DEFAULTONLY);
     }
@@ -213,17 +201,7 @@ namespace ContextQuickie
             else
             {
               IContextMenu* contextMenu;
-              if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_IContextMenu3, (void**)&(contextMenu))))
-              {
-              }
-              else if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_IContextMenu2, (void**)&(contextMenu))))
-              {
-              }
-              else if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_IContextMenu, (void**)&(contextMenu))))
-              {
-              }
-
-              if (SUCCEEDED(result))
+              if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_PPV_ARGS(&contextMenu))))
               {
                 this->GetMenuData(contextMenu, CMF_NORMAL);
               }
