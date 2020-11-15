@@ -145,6 +145,12 @@ namespace ContextQuickie
 
       if (menuInfo.hSubMenu != nullptr)
       {
+        IContextMenu2* contextMenu2 = nullptr;
+        if (SUCCEEDED(contextMenu->QueryInterface(IID_PPV_ARGS(&contextMenu2))))
+        {
+          contextMenu2->HandleMenuMsg(WM_INITMENUPOPUP, (WPARAM)menuInfo.hSubMenu, 0);
+        }
+
         this->AddEntries(contextMenu, menuInfo.hSubMenu, true);
         DestroyMenu(menuInfo.hSubMenu);
       }
