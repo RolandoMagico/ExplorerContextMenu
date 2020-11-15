@@ -65,6 +65,8 @@ namespace ContextQuickie
     this->CommandId = 0;
     this->IsSeparator = false;
     this->Text = nullptr;
+    this->CommandString = nullptr;
+    this->HelpText = nullptr;
   }
 
   ExplorerContextMenuEntry::ExplorerContextMenuEntry(IContextMenu* contextMenu, HMENU menu, int32_t index)
