@@ -113,18 +113,6 @@ namespace ContextQuickie
       {
         this->ExtractBitmapData(menuInfo.hbmpChecked);
       }
-      else
-      {
-        IExtractIcon* extractIcon;
-        if (SUCCEEDED(contextMenu->QueryInterface(IID_PPV_ARGS(&extractIcon))))
-        {          
-          int index;
-          UINT flags;
-          memset(buffer, 0, sizeof(buffer));
-          extractIcon->GetIconLocation(NULL, buffer, MAX_STRING_LENGTH, &index, &flags);
-          extractIcon->Release();
-        }
-      }
 
       // Get data from IContextMenu
       memset(buffer, 0, sizeof(buffer));
