@@ -73,12 +73,11 @@ namespace ContextQuickie
     : ExplorerContextMenuEntry()
   {
     this->ContextMenu = contextMenu;
-    this->ContextMenu->AddRef();
 
     wchar_t buffer[MAX_STRING_LENGTH] = { 0 };
 
     // Get data from MENUITEMINFO
-    MENUITEMINFO menuInfo;
+    MENUITEMINFO menuInfo = { 0 };
     memset(buffer, 0, sizeof(buffer));
     menuInfo.fMask = MIIM_BITMAP | MIIM_CHECKMARKS | MIIM_DATA | MIIM_FTYPE | MIIM_ID | MIIM_STATE | MIIM_STRING | MIIM_SUBMENU;
     menuInfo.cbSize = sizeof(MENUITEMINFO);
@@ -165,11 +164,6 @@ namespace ContextQuickie
       DeleteObject((HBITMAP)this->BitmapHandle);
     }
 
-    if (this->ContextMenu != nullptr)
-    {
-      this->ContextMenu->Release();
-    }
-
     if (this->Text != nullptr)
     {
       delete this->Text;
@@ -209,7 +203,7 @@ namespace ContextQuickie
 
   void ExplorerContextMenuEntry::ExtractBitmapData(HBITMAP bitmapHandle)
   {
-    BITMAP bitMap;
+    BITMAP bitMap = { 0 };
     if (GetObject(bitmapHandle, sizeof(BITMAP), &bitMap) != 0)
     {
       this->BitmapHandle = (uint32_t*)bitmapHandle;

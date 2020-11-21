@@ -60,6 +60,7 @@ namespace ContextQuickie
     HRESULT result = S_OK;
     IShellFolder* desktop = nullptr;
     ITEMIDLIST** itemIdList = nullptr;
+    UINT itemIdListLength = 0;
 
     if (paths.empty())
     {
@@ -77,9 +78,10 @@ namespace ContextQuickie
     {
       // Unable to retrive desktop opbject :-(
     }
-    else
+    else if ((itemIdList = (ITEMIDLIST**)CoTaskMemAlloc(paths.size() * sizeof(ITEMIDLIST*))) != NULL)
     {
-      itemIdList = new ITEMIDLIST * [paths.size()];
+      this->shellExtensions.push_back(desktop);
+      itemIdListLength = (UINT)paths.size();
       for (size_t pathIndex = 0; (pathIndex < paths.size()) && SUCCEEDED(result); pathIndex++)
       {
         result = desktop->ParseDisplayName(NULL, NULL, (LPWSTR)paths[pathIndex].c_str(), nullptr, &(itemIdList[pathIndex]), NULL);
@@ -89,7 +91,6 @@ namespace ContextQuickie
     if (SUCCEEDED(result))
     {
       LPCITEMIDLIST* itemIdListArg = (LPCITEMIDLIST*)itemIdList;
-      UINT itemIdListLength = (UINT)paths.size();
       if (FAILED(result = this->GetDefaultContextMenu(desktop, itemIdListArg, itemIdListLength)))
       {
         // Something went wrong when creating the default menu
@@ -102,14 +103,18 @@ namespace ContextQuickie
       this->RemoveDuplicateSeparators();
     }
 
-    if (desktop != nullptr)
-    {
-      desktop->Release();
-    }
-
     if (itemIdList != nullptr)
     {
-      delete[] itemIdList;
+      FreeIDListArray(itemIdList, itemIdListLength);
+    }
+  }
+
+  ExplorerContextMenu::~ExplorerContextMenu()
+  {
+    ULONG releaseStatus;
+    for (size_t index = 0; index < this->shellExtensions.size(); index++)
+    {
+      releaseStatus = this->shellExtensions[index]->Release();
     }
   }
 
@@ -126,6 +131,7 @@ namespace ContextQuickie
 
     if (SUCCEEDED(result = SHCreateDefaultContextMenu(&defaultContextMenu, IID_PPV_ARGS(&contextMenu))))
     {
+      this->shellExtensions.push_back(contextMenu);
       this->GetMenuData(contextMenu, CMF_DEFAULTONLY);
     }
 
@@ -162,7 +168,7 @@ namespace ContextQuickie
       {
         numberOfSubKey--;
         DWORD keyIndex = numberOfSubKey;
-        wchar_t registryValue[255];
+        wchar_t registryValue[255] = { 0 };
         DWORD bufferLength = sizeof(registryValue);
 
         DWORD numberOfReadBytes = subKeyMaxLength + 1;
@@ -197,16 +203,16 @@ namespace ContextQuickie
             else if (FAILED(result = shellExtInit->Initialize(NULL, dataObject, NULL)))
             {
               // Failed to initialied the shell extension
+              shellExtInit->Release();
             }
             else
             {
+              this->shellExtensions.push_back(shellExtInit);
               IContextMenu* contextMenu;
               if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_PPV_ARGS(&contextMenu))))
               {
                 this->GetMenuData(contextMenu, CMF_NORMAL);
               }
-
-              shellExtInit->Release();
             }
           }
         }
