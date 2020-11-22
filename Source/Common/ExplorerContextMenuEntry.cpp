@@ -203,13 +203,7 @@ namespace ContextQuickie
 
   void ExplorerContextMenuEntry::ExtractBitmapData(HBITMAP bitmapHandle)
   {
-    BITMAP bitMap = { 0 };
-    if (GetObject(bitmapHandle, sizeof(BITMAP), &bitMap) != 0)
-    {
-      this->BitmapHandle = (uint32_t*)bitmapHandle;
-      this->BitmapWidth = bitMap.bmWidth;
-      this->BitmapHeight = bitMap.bmHeight;
-    }
+    this->BitmapHandle = (uint32_t*)bitmapHandle;
   }
 
   void ExplorerContextMenuEntry::GetMenuData(IContextMenu* contextMenu, uint32_t flags)
