@@ -157,7 +157,7 @@ public class ExplorerContextMenuEntry
     return this.imageDescriptor;
   }
   
-  public void executeMenuCommand()
+  public void executeCommand()
   {
     this.executeNativeCommand(false);
   }
