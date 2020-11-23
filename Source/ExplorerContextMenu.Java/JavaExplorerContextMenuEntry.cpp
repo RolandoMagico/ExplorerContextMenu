@@ -90,6 +90,11 @@ JavaExplorerContextMenuEntry::JavaExplorerContextMenuEntry(JNIEnv* environment, 
     this->SetImageHandle(entry->BitmapHandle);
   }
 
+  if (entry->CommandString != nullptr)
+  {
+    this->SetCommandString(*(entry->CommandString));
+  }
+
   this->SetNativeHandle(entry);
   this->SetCommandId(entry->CommandId);
   this->SetSeperator(entry->IsSeparator);
@@ -113,22 +118,12 @@ jobject JavaExplorerContextMenuEntry::CreateInstance()
 
 void JavaExplorerContextMenuEntry::SetText(wstring& value)
 {
-  jmethodID setterMethod = this->javaEnvironment->GetMethodID(this->javaClass, "setText", "(Ljava/lang/String;)V");
-  if (setterMethod != nullptr)
-  {
-    jstring jValue = this->javaEnvironment->NewString((jchar*)(value.c_str()), (jsize)(value.length()));
-    this->javaEnvironment->CallVoidMethod(this->javaInstace, setterMethod, jValue);
-  }
+  this->InvokeStringSetterMethod("setText", value);
 }
 
 void JavaExplorerContextMenuEntry::SetHelpText(wstring& value)
 {
-  jmethodID setterMethod = this->javaEnvironment->GetMethodID(this->javaClass, "setHelpText", "(Ljava/lang/String;)V");
-  if (setterMethod != nullptr)
-  {
-    jstring jValue = this->javaEnvironment->NewString((jchar*)(value.c_str()), (jsize)(value.length()));
-    this->javaEnvironment->CallVoidMethod(this->javaInstace, setterMethod, jValue);
-  }
+  this->InvokeStringSetterMethod("setHelpText", value);
 }
 
 void JavaExplorerContextMenuEntry::SetCommandId(int32_t value)
@@ -140,13 +135,14 @@ void JavaExplorerContextMenuEntry::SetCommandId(int32_t value)
   }
 }
 
+void JavaExplorerContextMenuEntry::SetCommandString(wstring& value)
+{
+  this->InvokeStringSetterMethod("setCommandString", value);
+}
+
 void JavaExplorerContextMenuEntry::SetImageHandle(uint32_t* value)
 {
-  jmethodID setterMethod = this->javaEnvironment->GetMethodID(this->javaClass, "setImageHandle", "(J)V");
-  if (setterMethod != nullptr)
-  {
-    this->javaEnvironment->CallVoidMethod(this->javaInstace, setterMethod, value);
-  }
+  this->InvokeLongSetterMethod("setImageHandle", (int64_t)value);
 }
 
 ExplorerContextMenuEntry* JavaExplorerContextMenuEntry::GetNativeHandle()
@@ -163,11 +159,7 @@ ExplorerContextMenuEntry* JavaExplorerContextMenuEntry::GetNativeHandle()
 
 void JavaExplorerContextMenuEntry::SetNativeHandle(ExplorerContextMenuEntry* value)
 {
-  jmethodID setterMethod = this->javaEnvironment->GetMethodID(this->javaClass, "setNativeHandle", "(J)V");
-  if (setterMethod != nullptr)
-  {
-    this->javaEnvironment->CallVoidMethod(this->javaInstace, setterMethod, value);
-  }
+  this->InvokeLongSetterMethod("setNativeHandle", (int64_t)value);
 }
 
 void JavaExplorerContextMenuEntry::SetSeperator(bool value)
@@ -186,6 +178,25 @@ void JavaExplorerContextMenuEntry::AddEntry(JavaExplorerContextMenuEntry& value)
   if (setterMethod != nullptr)
   {
     this->javaEnvironment->CallVoidMethod(this->javaInstace, setterMethod, value.javaInstace);
+  }
+}
+
+void JavaExplorerContextMenuEntry::InvokeLongSetterMethod(const char* methodName, int64_t value)
+{
+  jmethodID setterMethod = this->javaEnvironment->GetMethodID(this->javaClass, methodName, "(J)V");
+  if (setterMethod != nullptr)
+  {
+    this->javaEnvironment->CallVoidMethod(this->javaInstace, setterMethod, value);
+  }
+}
+
+void JavaExplorerContextMenuEntry::InvokeStringSetterMethod(const char* methodName, wstring& value)
+{
+  jmethodID setterMethod = this->javaEnvironment->GetMethodID(this->javaClass, methodName, "(Ljava/lang/String;)V");
+  if (setterMethod != nullptr)
+  {
+    jstring jValue = this->javaEnvironment->NewString((jchar*)(value.c_str()), (jsize)(value.length()));
+    this->javaEnvironment->CallVoidMethod(this->javaInstace, setterMethod, jValue);
   }
 }
 /***********************************************************************************************************************

@@ -41,6 +41,8 @@ namespace ContextQuickie
     jobject javaInstace;
     JNIEnv* javaEnvironment;
     jobject CreateInstance();
+    void InvokeLongSetterMethod(const char* methodName, int64_t value);
+    void InvokeStringSetterMethod(const char* methodName, wstring& value);
   public:
     JavaExplorerContextMenuEntry(JNIEnv* environment, bool createInstance = true);
     JavaExplorerContextMenuEntry(JNIEnv* environment, jobject javaInstance);
@@ -49,6 +51,7 @@ namespace ContextQuickie
     void SetText(wstring& value);
     void SetHelpText(wstring& value);
     void SetCommandId(int32_t value);
+    void SetCommandString(wstring& value);
     void SetImageHandle(uint32_t* value);
     ExplorerContextMenuEntry* GetNativeHandle();
     void SetNativeHandle(ExplorerContextMenuEntry* value);
