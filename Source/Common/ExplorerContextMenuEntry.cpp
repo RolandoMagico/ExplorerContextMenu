@@ -222,13 +222,18 @@ namespace ContextQuickie
     DestroyMenu(menu);
   }
 
-  void ExplorerContextMenuEntry::ExecuteCommand()
+  void ExplorerContextMenuEntry::ExecuteCommand(bool executeSynchronous)
   {
     if (this->ContextMenu != nullptr)
     {
       CMINVOKECOMMANDINFO info = { 0 };
       info.cbSize = sizeof(info);
-      // TODO: info.hwnd = GetCurrentWindowHandle();
+
+      if (executeSynchronous == true)
+      {
+        info.fMask |= CMIC_MASK_NOASYNC;
+      }
+
       info.lpVerb = MAKEINTRESOURCEA(this->CommandId);
       this->ContextMenu->InvokeCommand(&info);
     }

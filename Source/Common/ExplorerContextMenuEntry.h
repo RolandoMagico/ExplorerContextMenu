@@ -57,7 +57,7 @@ namespace ContextQuickie
     ~ExplorerContextMenuEntry();
     size_t GetAllEntriesCount();
     void GetMenuData(IContextMenu* contextMenu, uint32_t flags);
-    void ExecuteCommand();
+    void ExecuteCommand(bool executeSynchronous = false);
     void PrintMenu(uint32_t level = 0);
     void RemoveDuplicateSeparators();
   };
