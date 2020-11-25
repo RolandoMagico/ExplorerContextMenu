@@ -50,7 +50,7 @@ namespace ContextQuickie
     uint32_t CommandId;
     uint32_t BitmapWidth;
     uint32_t BitmapHeight;
-    uint32_t* BitmapHandle;
+    HBITMAP BitmapHandle;
     vector<ExplorerContextMenuEntry*> menuEntries;
     ExplorerContextMenuEntry();
     ExplorerContextMenuEntry(IContextMenu* contextMenu, HMENU menu, int32_t index);
