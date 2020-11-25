@@ -142,23 +142,40 @@ void JavaExplorerContextMenuEntry::SetCommandString(wstring& value)
 
 void JavaExplorerContextMenuEntry::SetImageHandle(HBITMAP value)
 {
-  HDC hdc = ::GetDC(HWND_DESKTOP);
+  HDC deviceContextHandle;
   BITMAP bitmap = { 0 };
-  GetObject(value, sizeof(bitmap), &bitmap);
-  BITMAPINFO bitmapInfo = { 0 };
-  bitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-  bitmapInfo.bmiHeader.biWidth = bitmap.bmWidth;
-  bitmapInfo.bmiHeader.biHeight = bitmap.bmHeight;
-  bitmapInfo.bmiHeader.biPlanes = 1;
-  bitmapInfo.bmiHeader.biBitCount = 32;
+  if ((deviceContextHandle = GetDC(HWND_DESKTOP)) == NULL)
+  {
+    // GetDC failed
+  }
+  else if (GetObject(value, sizeof(bitmap), &bitmap) == 0)
+  {
+    // GetObject failed
+  }
+  else
+  {
+    BITMAPINFO bitmapInfo = { 0 };
+    bitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bitmapInfo.bmiHeader.biWidth = bitmap.bmWidth;
+    bitmapInfo.bmiHeader.biHeight = bitmap.bmHeight * -1;
+    bitmapInfo.bmiHeader.biPlanes = bitmap.bmPlanes;
+    bitmapInfo.bmiHeader.biBitCount = bitmap.bmBitsPixel;
 
-  size_t arraySize = (size_t)bitmap.bmWidth * bitmap.bmHeight * 4;
-  vector<int8_t> pixels(arraySize);
-  GetDIBits(hdc, value, 0, bitmap.bmHeight, &pixels[0], &bitmapInfo, DIB_RGB_COLORS);
-  this->InvokeIntSetterMethod("setImageDepth", bitmapInfo.bmiHeader.biBitCount);
-  this->InvokeIntSetterMethod("setImageHeigth", bitmapInfo.bmiHeader.biHeight);
-  this->InvokeIntSetterMethod("setImageWidth", bitmapInfo.bmiHeader.biWidth);
-  this->InvokeByteArraySetterMethod("setImageData", pixels);
+    size_t arraySize = (size_t)bitmap.bmWidth * bitmap.bmHeight * 4;
+    vector<int8_t> pixels(arraySize);
+    if (GetDIBits(deviceContextHandle, value, 0, bitmap.bmHeight, &pixels[0], &bitmapInfo, DIB_RGB_COLORS) != 0)
+    {
+      this->InvokeIntSetterMethod("setImageDepth", bitmap.bmBitsPixel);
+      this->InvokeIntSetterMethod("setImageHeigth", bitmap.bmHeight);
+      this->InvokeIntSetterMethod("setImageWidth", bitmap.bmWidth);
+      this->InvokeByteArraySetterMethod("setImageData", pixels);
+    }
+  }
+
+  if (deviceContextHandle != NULL)
+  {
+    ReleaseDC(HWND_DESKTOP, deviceContextHandle);
+  }
 }
 
 ExplorerContextMenuEntry* JavaExplorerContextMenuEntry::GetNativeHandle()
