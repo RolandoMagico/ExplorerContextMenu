@@ -158,14 +158,7 @@ void JavaExplorerContextMenuEntry::SetImageHandle(HBITMAP value)
   this->InvokeIntSetterMethod("setImageDepth", bitmapInfo.bmiHeader.biBitCount);
   this->InvokeIntSetterMethod("setImageHeigth", bitmapInfo.bmiHeader.biHeight);
   this->InvokeIntSetterMethod("setImageWidth", bitmapInfo.bmiHeader.biWidth);
-
-  jbyteArray javaData = this->javaEnvironment->NewByteArray((jsize)arraySize);
-  this->javaEnvironment->SetByteArrayRegion(javaData, 0, (jsize)arraySize, pixels.data());
-  jmethodID setterMethod = this->javaEnvironment->GetMethodID(this->javaClass, "setImageData", "([B)V");
-  if (setterMethod != nullptr)
-  {
-    this->javaEnvironment->CallVoidMethod(this->javaInstace, setterMethod, javaData);
-  }
+  this->InvokeByteArraySetterMethod("setImageData", pixels);
 }
 
 ExplorerContextMenuEntry* JavaExplorerContextMenuEntry::GetNativeHandle()
@@ -201,6 +194,18 @@ void JavaExplorerContextMenuEntry::AddEntry(JavaExplorerContextMenuEntry& value)
   if (setterMethod != nullptr)
   {
     this->javaEnvironment->CallVoidMethod(this->javaInstace, setterMethod, value.javaInstace);
+  }
+}
+
+void JavaExplorerContextMenuEntry::InvokeByteArraySetterMethod(const char* methodName, vector<int8_t>& value)
+{
+  jsize arrayLength = static_cast<jsize>(value.size());
+  jbyteArray javaArray = this->javaEnvironment->NewByteArray(arrayLength);
+  this->javaEnvironment->SetByteArrayRegion(javaArray, 0, arrayLength, value.data());
+  jmethodID setterMethod = this->javaEnvironment->GetMethodID(this->javaClass, methodName, "([B)V");
+  if (setterMethod != nullptr)
+  {
+    this->javaEnvironment->CallVoidMethod(this->javaInstace, setterMethod, javaArray);
   }
 }
 

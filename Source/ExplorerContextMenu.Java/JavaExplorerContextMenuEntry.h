@@ -41,6 +41,7 @@ namespace ContextQuickie
     jobject javaInstace;
     JNIEnv* javaEnvironment;
     jobject CreateInstance();
+    void InvokeByteArraySetterMethod(const char* methodName, vector<int8_t>& value);
     void InvokeIntSetterMethod(const char* methodName, int32_t value);
     void InvokeLongSetterMethod(const char* methodName, int64_t value);
     void InvokeStringSetterMethod(const char* methodName, wstring& value);
