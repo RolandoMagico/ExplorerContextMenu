@@ -41,6 +41,7 @@ namespace ContextQuickie
     jobject javaInstace;
     JNIEnv* javaEnvironment;
     jobject CreateInstance();
+    void InvokeIntSetterMethod(const char* methodName, int32_t value);
     void InvokeLongSetterMethod(const char* methodName, int64_t value);
     void InvokeStringSetterMethod(const char* methodName, wstring& value);
   public:
@@ -52,7 +53,7 @@ namespace ContextQuickie
     void SetHelpText(wstring& value);
     void SetCommandId(int32_t value);
     void SetCommandString(wstring& value);
-    void SetImageHandle(uint32_t* value);
+    void SetImageHandle(HBITMAP value);
     ExplorerContextMenuEntry* GetNativeHandle();
     void SetNativeHandle(ExplorerContextMenuEntry* value);
     void SetSeperator(bool value);

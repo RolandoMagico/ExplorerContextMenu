@@ -140,9 +140,32 @@ void JavaExplorerContextMenuEntry::SetCommandString(wstring& value)
   this->InvokeStringSetterMethod("setCommandString", value);
 }
 
-void JavaExplorerContextMenuEntry::SetImageHandle(uint32_t* value)
+void JavaExplorerContextMenuEntry::SetImageHandle(HBITMAP value)
 {
-  this->InvokeLongSetterMethod("setImageHandle", (int64_t)value);
+  HDC hdc = ::GetDC(HWND_DESKTOP);
+  BITMAP bitmap = { 0 };
+  GetObject(value, sizeof(bitmap), &bitmap);
+  BITMAPINFO bitmapInfo = { 0 };
+  bitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+  bitmapInfo.bmiHeader.biWidth = bitmap.bmWidth;
+  bitmapInfo.bmiHeader.biHeight = bitmap.bmHeight;
+  bitmapInfo.bmiHeader.biPlanes = 1;
+  bitmapInfo.bmiHeader.biBitCount = 32;
+
+  size_t arraySize = (size_t)bitmap.bmWidth * bitmap.bmHeight * 4;
+  vector<int8_t> pixels(arraySize);
+  GetDIBits(hdc, value, 0, bitmap.bmHeight, &pixels[0], &bitmapInfo, DIB_RGB_COLORS);
+  this->InvokeIntSetterMethod("setImageDepth", bitmapInfo.bmiHeader.biBitCount);
+  this->InvokeIntSetterMethod("setImageHeigth", bitmapInfo.bmiHeader.biHeight);
+  this->InvokeIntSetterMethod("setImageWidth", bitmapInfo.bmiHeader.biWidth);
+
+  jbyteArray javaData = this->javaEnvironment->NewByteArray((jsize)arraySize);
+  this->javaEnvironment->SetByteArrayRegion(javaData, 0, (jsize)arraySize, pixels.data());
+  jmethodID setterMethod = this->javaEnvironment->GetMethodID(this->javaClass, "setImageData", "([B)V");
+  if (setterMethod != nullptr)
+  {
+    this->javaEnvironment->CallVoidMethod(this->javaInstace, setterMethod, javaData);
+  }
 }
 
 ExplorerContextMenuEntry* JavaExplorerContextMenuEntry::GetNativeHandle()
@@ -178,6 +201,15 @@ void JavaExplorerContextMenuEntry::AddEntry(JavaExplorerContextMenuEntry& value)
   if (setterMethod != nullptr)
   {
     this->javaEnvironment->CallVoidMethod(this->javaInstace, setterMethod, value.javaInstace);
+  }
+}
+
+void JavaExplorerContextMenuEntry::InvokeIntSetterMethod(const char* methodName, int32_t value)
+{
+  jmethodID setterMethod = this->javaEnvironment->GetMethodID(this->javaClass, methodName, "(I)V");
+  if (setterMethod != nullptr)
+  {
+    this->javaEnvironment->CallVoidMethod(this->javaInstace, setterMethod, value);
   }
 }
 
