@@ -88,7 +88,7 @@ namespace ContextQuickie
       }
     }
 
-    if (SUCCEEDED(result))
+    if (SUCCEEDED(result) && (itemIdListLength != 0))
     {
       LPCITEMIDLIST* itemIdListArg = (LPCITEMIDLIST*)itemIdList;
       if (FAILED(result = this->GetDefaultContextMenu(desktop, itemIdListArg, itemIdListLength)))
