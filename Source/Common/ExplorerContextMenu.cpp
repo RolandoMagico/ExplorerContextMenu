@@ -55,7 +55,7 @@
 ***********************************************************************************************************************/
 namespace ContextQuickie
 {
-  ExplorerContextMenu::ExplorerContextMenu(vector<wstring>& paths)
+  ExplorerContextMenu::ExplorerContextMenu(vector<wstring>& paths, bool createDefaultMenu)
   {
     HRESULT result = S_OK;
     IShellFolder* desktop = nullptr;
@@ -91,13 +91,21 @@ namespace ContextQuickie
     if (SUCCEEDED(result) && (itemIdListLength != 0))
     {
       LPCITEMIDLIST* itemIdListArg = (LPCITEMIDLIST*)itemIdList;
-      if (FAILED(result = this->GetDefaultContextMenu(desktop, itemIdListArg, itemIdListLength)))
+      if (createDefaultMenu == true)
       {
-        // Something went wrong when creating the default menu
+        if (FAILED(result = this->GetDefaultContextMenu(desktop, itemIdListArg, itemIdListLength)))
+        {
+          // Something went wrong when creating the default menu
+        }
       }
-      else if (FAILED(result = this->GetExtendedContextMenu(desktop, itemIdListArg, itemIdListLength)))
+      
+      if (SUCCEEDED(result))
       {
-        // Something went wrong when creating the exteneded menu
+        // Create extended context menu only if default was either skipped or successful
+        if (FAILED(result = this->GetExtendedContextMenu(desktop, itemIdListArg, itemIdListLength)))
+        {
+          // Something went wrong when creating the exteneded menu
+        }
       }
 
       this->RemoveDuplicateSeparators();

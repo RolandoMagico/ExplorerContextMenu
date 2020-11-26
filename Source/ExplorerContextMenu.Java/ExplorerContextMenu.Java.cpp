@@ -73,7 +73,7 @@ JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenu_getEntr
     env->ReleaseStringChars(jstringPath, jcharPath);
   }
 
-  Java_explorercontextmenu_menu_ExplorerContextMenu_Menu = new ExplorerContextMenu (convertedPaths);
+  Java_explorercontextmenu_menu_ExplorerContextMenu_Menu = new ExplorerContextMenu (convertedPaths, true);
   JavaExplorerContextMenuEntry wrapper(env, instance);
   wrapper.CopyEntries(*Java_explorercontextmenu_menu_ExplorerContextMenu_Menu);
 }

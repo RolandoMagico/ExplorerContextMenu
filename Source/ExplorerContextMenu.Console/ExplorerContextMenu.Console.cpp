@@ -62,7 +62,7 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
     paths.push_back(argv[argumentIndex]);
   }
 
-  ExplorerContextMenu contextMenu(paths);
+  ExplorerContextMenu contextMenu(paths, true);
   contextMenu.PrintMenu();
   return 0;
 }

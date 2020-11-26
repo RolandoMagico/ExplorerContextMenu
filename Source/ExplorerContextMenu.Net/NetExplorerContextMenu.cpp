@@ -64,7 +64,7 @@ namespace ContextQuickie
       convertedPaths.push_back(static_cast<wchar_t*>(Marshal::StringToHGlobalUni(path).ToPointer()));
     }
 
-    this->nativeMenu = new ExplorerContextMenu(convertedPaths);
+    this->nativeMenu = new ExplorerContextMenu(convertedPaths, true);
     this->CopyNativeData(this->nativeMenu);
   }
 }

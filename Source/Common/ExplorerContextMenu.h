@@ -47,7 +47,7 @@ namespace ContextQuickie
     HRESULT GetExtendedContextMenu(IShellFolder* desktop, LPCITEMIDLIST* itemIdList, UINT itemIdListLength);
 
   public:
-    ExplorerContextMenu(vector<wstring>& paths);
+    ExplorerContextMenu(vector<wstring>& paths, bool createDefaultMenu);
     ~ExplorerContextMenu();
   };
 }
