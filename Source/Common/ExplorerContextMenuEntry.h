@@ -40,6 +40,7 @@ namespace ContextQuickie
   {
   private:
     IContextMenu* ContextMenu = nullptr;
+    uint32_t NextInsertPosition = 0;
     void AddEntries(IContextMenu* contextMenu, HMENU menu, bool isDefaultMenu);
     void ExtractBitmapData(HBITMAP bitmapHandle);
   public:

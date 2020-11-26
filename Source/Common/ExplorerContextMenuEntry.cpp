@@ -188,16 +188,24 @@ namespace ContextQuickie
     for (uint32_t menuIndex = 0; menuIndex < (uint32_t)menuItemCount; menuIndex++)
     {
       ExplorerContextMenuEntry* entry = new ExplorerContextMenuEntry(contextMenu, menu, menuIndex);
-      createdEntries.push_back(entry);
+      if (isDefaultMenu == true)
+      {
+        this->menuEntries.push_back(entry);
+      }
+      else
+      {
+        this->menuEntries.insert(this->menuEntries.begin() + this->NextInsertPosition, entry);
+        this->NextInsertPosition++;
+      }
     }
 
-    if ((isDefaultMenu == true))
+    if (isDefaultMenu == true)
     {
-      this->menuEntries.insert(this->menuEntries.cend(), createdEntries.begin(), createdEntries.end());
-    }
-    else if (createdEntries.empty() == false)
-    {
-      this->menuEntries.insert(this->menuEntries.begin() + 1, createdEntries.begin(), createdEntries.end());
+      // Assumption: Default entry is the first entry in the menu
+      if (menuItemCount > 0)
+      {
+        this->NextInsertPosition++;
+      }
     }
   }
 

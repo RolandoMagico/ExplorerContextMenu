@@ -162,12 +162,8 @@ namespace ContextQuickie
     }
     else
     {
-      // Loop over subkeys in reverse order because menu entries are always added at the beginning
-      // If reverse order is not used, the menu order differs from the order shown in the explorer
-      while (numberOfSubKey > 0)
+      for (uint32_t keyIndex = 0; keyIndex < numberOfSubKey; keyIndex++)
       {
-        numberOfSubKey--;
-        DWORD keyIndex = numberOfSubKey;
         wchar_t registryValue[255] = { 0 };
         DWORD bufferLength = sizeof(registryValue);
 
