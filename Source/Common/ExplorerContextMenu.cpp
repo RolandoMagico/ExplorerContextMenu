@@ -55,7 +55,7 @@
 ***********************************************************************************************************************/
 namespace ContextQuickie
 {
-  ExplorerContextMenu::ExplorerContextMenu(vector<wstring>& paths, bool createDefaultMenu)
+  ExplorerContextMenu::ExplorerContextMenu(const vector<wstring>& paths, bool createDefaultMenu, const set<wstring>& extendedMenuWhitelist)
   {
     HRESULT result = S_OK;
     IShellFolder* desktop = nullptr;
@@ -102,7 +102,7 @@ namespace ContextQuickie
       if (SUCCEEDED(result))
       {
         // Create extended context menu only if default was either skipped or successful
-        if (FAILED(result = this->GetExtendedContextMenu(desktop, itemIdListArg, itemIdListLength)))
+        if (FAILED(result = this->GetExtendedContextMenu(desktop, itemIdListArg, itemIdListLength, extendedMenuWhitelist)))
         {
           // Something went wrong when creating the exteneded menu
         }
@@ -149,7 +149,7 @@ namespace ContextQuickie
     return result;
   }
 
-  HRESULT ExplorerContextMenu::GetExtendedContextMenu(IShellFolder* desktop, LPCITEMIDLIST* itemIdList, UINT itemIdListLength)
+  HRESULT ExplorerContextMenu::GetExtendedContextMenu(IShellFolder* desktop, LPCITEMIDLIST* itemIdList, UINT itemIdListLength, const set<wstring>& extendedMenuWhitelist)
   {
     HRESULT result = S_OK;
     IDataObject* dataObject = nullptr;
@@ -193,14 +193,18 @@ namespace ContextQuickie
         {
           // Convert string to CLSID. As some plugins use the registry key name for the ID and some use the registry value, try both
           GUID CLSID_NewMenu;
+          wchar_t* clsidString = nullptr;
           if (SUCCEEDED(result = CLSIDFromString(registryValue, &CLSID_NewMenu)))
           {
+            clsidString = registryValue;
           }
           else if (SUCCEEDED(result = CLSIDFromString(registryKeyName, &CLSID_NewMenu)))
           {
+            clsidString = registryKeyName;
           }
 
-          if (SUCCEEDED(result))
+          if (SUCCEEDED(result) && 
+              (extendedMenuWhitelist.empty() || (extendedMenuWhitelist.find(clsidString) != extendedMenuWhitelist.end())))
           {
             IShellExtInit* shellExtInit;
             if (FAILED(result = CoCreateInstance(CLSID_NewMenu, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellExtInit))))

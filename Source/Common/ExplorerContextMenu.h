@@ -26,6 +26,7 @@
  INCLUDES
 ***********************************************************************************************************************/
 #pragma once
+#include <set>
 #include <string>
 #include <vector>
 
@@ -44,10 +45,10 @@ namespace ContextQuickie
   private:
     vector<IUnknown*> shellExtensions;
     HRESULT GetDefaultContextMenu(IShellFolder* desktop, LPCITEMIDLIST* itemIdList, UINT itemIdListLength);
-    HRESULT GetExtendedContextMenu(IShellFolder* desktop, LPCITEMIDLIST* itemIdList, UINT itemIdListLength);
+    HRESULT GetExtendedContextMenu(IShellFolder* desktop, LPCITEMIDLIST* itemIdList, UINT itemIdListLength, const set<wstring>& extendedMenuWhitelist);
 
   public:
-    ExplorerContextMenu(vector<wstring>& paths, bool createDefaultMenu);
+    ExplorerContextMenu(const vector<wstring>& paths, bool createDefaultMenu = true, const set<wstring>& extendedMenuWhitelist = set<wstring>());
     ~ExplorerContextMenu();
   };
 }
