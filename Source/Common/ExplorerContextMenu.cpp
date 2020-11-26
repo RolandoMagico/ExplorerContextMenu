@@ -105,7 +105,10 @@ namespace ContextQuickie
 
     if (itemIdList != nullptr)
     {
-      FreeIDListArray(itemIdList, itemIdListLength);
+      for (uint32_t i = 0; i < itemIdListLength; i++)
+      {
+        CoTaskMemFree(&(itemIdList[i]));
+      }
     }
   }
 
