@@ -56,19 +56,31 @@ using namespace ContextQuickie;
 /***********************************************************************************************************************
  IMPLEMENTATION
 ***********************************************************************************************************************/
-JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenu_getEntries(JNIEnv* env, jobject instance, jobjectArray paths)
+static void Java_explorercontextmenu_menu_CopyStringArrayToVector(JNIEnv* env, jobjectArray source, vector<wstring>& target)
 {
-  uint32_t pathsCount = env->GetArrayLength(paths);
-  vector<wstring> convertedPaths;
-  for (uint32_t pathIndex = 0; pathIndex < pathsCount; pathIndex++)
+  if (source != nullptr)
   {
-    jstring jstringPath = (jstring) env->GetObjectArrayElement(paths, pathIndex);
-    const jchar* jcharPath = env->GetStringChars(jstringPath, JNI_FALSE);
-    convertedPaths.push_back((wchar_t*)jcharPath);
-    env->ReleaseStringChars(jstringPath, jcharPath);
+    uint32_t sourceCount = env->GetArrayLength(source);
+    for (uint32_t sourceIndex = 0; sourceIndex < sourceCount; sourceIndex++)
+    {
+      jstring jstringPath = (jstring)env->GetObjectArrayElement(source, sourceIndex);
+      const jchar* jcharPath = env->GetStringChars(jstringPath, JNI_FALSE);
+      target.push_back((wchar_t*)jcharPath);
+      env->ReleaseStringChars(jstringPath, jcharPath);
+    }
   }
+}
+JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenu_getEntries(JNIEnv* env, jobject instance, jobjectArray paths, jboolean createDefaultMenu, jobjectArray extendedMenuWhitelist)
+{
+  vector<wstring> convertedPaths;
+  vector<wstring> tempExtendedMenuWhitelist;
 
-  ExplorerContextMenu* menu = new ExplorerContextMenu (convertedPaths, true);
+  Java_explorercontextmenu_menu_CopyStringArrayToVector(env, paths, convertedPaths);
+  Java_explorercontextmenu_menu_CopyStringArrayToVector(env, extendedMenuWhitelist, tempExtendedMenuWhitelist);
+
+  set<wstring> convertedExtendedMenuWhitelist(tempExtendedMenuWhitelist.begin(), tempExtendedMenuWhitelist.end());
+
+  ExplorerContextMenu* menu = new ExplorerContextMenu(convertedPaths, createDefaultMenu, convertedExtendedMenuWhitelist);
   JavaExplorerContextMenuEntry wrapper(env, instance);
   wrapper.SetNativeHandle(menu);
   wrapper.CopyEntries(*menu);
