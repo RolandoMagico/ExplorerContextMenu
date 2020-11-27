@@ -289,6 +289,17 @@ namespace ContextQuickie
       }
     }
 
+    // Remove separator at the end if there is one
+    if (this->menuEntries.empty() == false)
+    {
+      ExplorerContextMenuEntry* entry = this->menuEntries.at(this->menuEntries.size() - 1);
+      if (entry->IsSeparator == true)
+      {
+        this->menuEntries.pop_back();
+        delete entry;
+      }
+    }
+
     for (size_t childIndex = 0; childIndex < this->menuEntries.size(); childIndex++)
     {
       this->menuEntries[childIndex]->RemoveDuplicateSeparators();
