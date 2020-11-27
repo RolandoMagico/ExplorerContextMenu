@@ -48,7 +48,7 @@ using namespace ContextQuickie;
 /***********************************************************************************************************************
  LOCAL VARIABLES
 ***********************************************************************************************************************/
-static ExplorerContextMenu* Java_explorercontextmenu_menu_ExplorerContextMenu_Menu = nullptr;
+
 /***********************************************************************************************************************
  LOCAL FUNCTION DECLARATIONS
 ***********************************************************************************************************************/
@@ -58,11 +58,6 @@ static ExplorerContextMenu* Java_explorercontextmenu_menu_ExplorerContextMenu_Me
 ***********************************************************************************************************************/
 JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenu_getEntries(JNIEnv* env, jobject instance, jobjectArray paths)
 {
-  if (Java_explorercontextmenu_menu_ExplorerContextMenu_Menu != nullptr)
-  {
-    delete Java_explorercontextmenu_menu_ExplorerContextMenu_Menu;
-  }
-
   uint32_t pathsCount = env->GetArrayLength(paths);
   vector<wstring> convertedPaths;
   for (uint32_t pathIndex = 0; pathIndex < pathsCount; pathIndex++)
@@ -73,9 +68,20 @@ JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenu_getEntr
     env->ReleaseStringChars(jstringPath, jcharPath);
   }
 
-  Java_explorercontextmenu_menu_ExplorerContextMenu_Menu = new ExplorerContextMenu (convertedPaths, true);
+  ExplorerContextMenu* menu = new ExplorerContextMenu (convertedPaths, true);
   JavaExplorerContextMenuEntry wrapper(env, instance);
-  wrapper.CopyEntries(*Java_explorercontextmenu_menu_ExplorerContextMenu_Menu);
+  wrapper.SetNativeHandle(menu);
+  wrapper.CopyEntries(*menu);
+}
+
+JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenu_deleteUnmanagedInstance(JNIEnv* env, jobject instance)
+{
+  JavaExplorerContextMenuEntry javaEntry(env, instance);
+  ExplorerContextMenu* menu = (ExplorerContextMenu*)javaEntry.GetNativeHandle();
+  if (menu != nullptr)
+  {
+    delete menu;
+  }
 }
 
 JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenuEntry_executeNativeCommand(JNIEnv* env, jobject instance, jboolean executeSynchronous)

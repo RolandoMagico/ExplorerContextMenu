@@ -15,6 +15,14 @@ extern "C" {
 JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenu_getEntries
   (JNIEnv *, jobject, jobjectArray);
 
+/*
+ * Class:     explorercontextmenu_menu_ExplorerContextMenu
+ * Method:    deleteUnmanagedInstance
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenu_deleteUnmanagedInstance
+  (JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif
