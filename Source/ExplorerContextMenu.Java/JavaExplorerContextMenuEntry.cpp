@@ -39,6 +39,7 @@ using namespace ContextQuickie;
 /***********************************************************************************************************************
  LOCAL CONSTANTS
 ***********************************************************************************************************************/
+const string JavaExplorerContextMenuEntry::javaClassName("explorercontextmenu/menu/ExplorerContextMenuEntry");
 
 /***********************************************************************************************************************
  LOCAL VARIABLES
@@ -51,69 +52,58 @@ using namespace ContextQuickie;
 /***********************************************************************************************************************
  IMPLEMENTATION
 ***********************************************************************************************************************/
-JavaExplorerContextMenuEntry::JavaExplorerContextMenuEntry(JNIEnv* environment, bool createInstance)
+JavaExplorerContextMenuEntry::JavaExplorerContextMenuEntry(JNIEnv* environment)
 {
-  this->javaClassName = string("explorercontextmenu/menu/ExplorerContextMenuEntry");
+  this->javaInstace = nullptr;
   this->javaEnvironment = environment;
   this->javaClass = this->javaEnvironment->FindClass(this->javaClassName.c_str());
-  if (createInstance == true)
+}
+
+JavaExplorerContextMenuEntry::JavaExplorerContextMenuEntry(JNIEnv* environment, ExplorerContextMenuEntry& entry)
+  : JavaExplorerContextMenuEntry(environment)
+{
+  jmethodID constructor = this->javaEnvironment->GetMethodID(this->javaClass, "<init>", "()V");
+  this->javaInstace = this->javaEnvironment->NewObject(this->javaClass, constructor);
+
+  if (entry.Text != nullptr)
   {
-    this->javaInstace = this->CreateInstance();
+    this->SetText(*(entry.Text));
   }
-  else
+
+  if (entry.HelpText != nullptr)
   {
-    this->javaInstace = NULL;
+    this->SetHelpText(*(entry.HelpText));
   }
+
+  if (entry.BitmapHandle != nullptr)
+  {
+    this->SetImageHandle(entry.BitmapHandle);
+  }
+
+  if (entry.CommandString != nullptr)
+  {
+    this->SetCommandString(*(entry.CommandString));
+  }
+
+  this->SetNativeHandle(&entry);
+  this->SetCommandId(entry.CommandId);
+  this->SetSeperator(entry.IsSeparator);
 }
 
 JavaExplorerContextMenuEntry::JavaExplorerContextMenuEntry(JNIEnv* environment, jobject javaInstance)
-  : JavaExplorerContextMenuEntry(environment, false)
-{
-  this->javaInstace = javaInstance;
-}
-
-JavaExplorerContextMenuEntry::JavaExplorerContextMenuEntry(JNIEnv* environment, ExplorerContextMenuEntry* entry)
   : JavaExplorerContextMenuEntry(environment)
 {
-  if (entry->Text != nullptr)
-  {
-    this->SetText(*(entry->Text));
-  }
-
-  if (entry->HelpText != nullptr)
-  {
-    this->SetHelpText(*(entry->HelpText));
-  }
-
-  if (entry->BitmapHandle != nullptr)
-  {
-    this->SetImageHandle(entry->BitmapHandle);
-  }
-
-  if (entry->CommandString != nullptr)
-  {
-    this->SetCommandString(*(entry->CommandString));
-  }
-
-  this->SetNativeHandle(entry);
-  this->SetCommandId(entry->CommandId);
-  this->SetSeperator(entry->IsSeparator);
+  this->javaInstace = javaInstance;
 }
 
 void JavaExplorerContextMenuEntry::CopyEntries(ExplorerContextMenuEntry& entry)
 {
   for (size_t index = 0; index < entry.menuEntries.size(); index++)
   {
-    JavaExplorerContextMenuEntry wrapper(this->javaEnvironment, entry.menuEntries[index]);
+    JavaExplorerContextMenuEntry wrapper(this->javaEnvironment, *entry.menuEntries[index]);
     this->AddEntry(wrapper);
     wrapper.CopyEntries(*(entry.menuEntries[index]));
   }
-}
-
-jobject JavaExplorerContextMenuEntry::CreateInstance()
-{
-  jmethodID constructor = this->javaEnvironment->GetMethodID(this->javaClass, "<init>", "()V");
-  return this->javaEnvironment->NewObject(this->javaClass, constructor);
 }
 
 void JavaExplorerContextMenuEntry::SetText(wstring& value)

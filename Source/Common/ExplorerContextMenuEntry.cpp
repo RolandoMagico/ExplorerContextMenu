@@ -59,14 +59,7 @@ namespace ContextQuickie
 
   ExplorerContextMenuEntry::ExplorerContextMenuEntry()
   {
-    this->BitmapHandle = nullptr;
-    this->BitmapWidth = 0;
-    this->BitmapHeight = 0;
-    this->CommandId = 0;
-    this->IsSeparator = false;
-    this->Text = nullptr;
-    this->CommandString = nullptr;
-    this->HelpText = nullptr;
+
   }
 
   ExplorerContextMenuEntry::ExplorerContextMenuEntry(IContextMenu* contextMenu, HMENU menu, int32_t index)
@@ -102,15 +95,15 @@ namespace ContextQuickie
 
       if (menuInfo.hbmpItem != nullptr)
       {
-        this->ExtractBitmapData(menuInfo.hbmpItem);
+        this->BitmapHandle = menuInfo.hbmpItem;
       }
       else if (menuInfo.hbmpUnchecked != nullptr)
       {
-        this->ExtractBitmapData(menuInfo.hbmpUnchecked);
+        this->BitmapHandle = menuInfo.hbmpUnchecked;
       }
       else if (menuInfo.hbmpChecked != nullptr)
       {
-        this->ExtractBitmapData(menuInfo.hbmpChecked);
+        this->BitmapHandle = menuInfo.hbmpChecked;
       }
 
       // Get data from IContextMenu
@@ -207,11 +200,6 @@ namespace ContextQuickie
         this->NextInsertPosition++;
       }
     }
-  }
-
-  void ExplorerContextMenuEntry::ExtractBitmapData(HBITMAP bitmapHandle)
-  {
-    this->BitmapHandle = bitmapHandle;
   }
 
   void ExplorerContextMenuEntry::GetMenuData(IContextMenu* contextMenu, uint32_t flags)

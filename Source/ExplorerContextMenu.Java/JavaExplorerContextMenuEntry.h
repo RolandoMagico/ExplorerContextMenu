@@ -33,32 +33,143 @@
 ***********************************************************************************************************************/
 namespace ContextQuickie
 {
+  /// <summary>
+  /// A C++ wrapper for accessing the Java context menu entry using JNI.
+  /// </summary>
   class JavaExplorerContextMenuEntry
   {
   private:
-    string javaClassName;
-    jclass javaClass;
-    jobject javaInstace;
-    JNIEnv* javaEnvironment;
-    jobject CreateInstance();
+    /// <summary>
+    /// The name of the java class which is wrapped.
+    /// </summary>
+    static const string javaClassName;
+
+    /// <summary>
+    /// The reference to the Java class which is wrapped.
+    /// </summary>
+    jclass javaClass = nullptr;
+
+    /// <summary>
+    /// The reference to the Java instance which is wrapped.
+    /// </summary>
+    jobject javaInstace = nullptr;
+
+    /// <summary>
+    /// The reference to the current Java environment. 
+    /// </summary>
+    JNIEnv* javaEnvironment = nullptr;
+
+    /// <summary>
+    /// Private constructor which only initializes the Java environment. It doesn't create a Java instance.
+    /// </summary>
+    /// <param name="environment">The reference to the current Java environment.</param>
+    JavaExplorerContextMenuEntry(JNIEnv* environment);
+
+    /// <summary>
+    /// Invokes a setter method of the java instance which has a byte array as argument and void as return value.
+    /// </summary>
+    /// <param name="methodName">The name of the Java method.</param>
+    /// <param name="value">The value which is passed to the method during the call.</param>
     void InvokeByteArraySetterMethod(const char* methodName, vector<int8_t>& value);
+    
+    /// <summary>
+    /// Invokes a setter method of the java instance which has an integer value as argument and void as return value.
+    /// </summary>
+    /// <param name="methodName">The name of the Java method.</param>
+    /// <param name="value">The value which is passed to the method during the call.</param>
     void InvokeIntSetterMethod(const char* methodName, int32_t value);
+    
+    /// <summary>
+    /// Invokes a setter method of the java instance which has a long value as argument and void as return value.
+    /// </summary>
+    /// <param name="methodName">The name of the Java method.</param>
+    /// <param name="value">The value which is passed to the method during the call.</param>
     void InvokeLongSetterMethod(const char* methodName, int64_t value);
+    
+    /// <summary>
+    /// Invokes a setter method of the java instance which has a string value as argument and void as return value.
+    /// </summary>
+    /// <param name="methodName">The name of the Java method.</param>
+    /// <param name="value">The value which is passed to the method during the call.</param>
     void InvokeStringSetterMethod(const char* methodName, wstring& value);
-  public:
-    JavaExplorerContextMenuEntry(JNIEnv* environment, bool createInstance = true);
-    JavaExplorerContextMenuEntry(JNIEnv* environment, jobject javaInstance);
-    JavaExplorerContextMenuEntry(JNIEnv* environment, ExplorerContextMenuEntry* entry);
-    void CopyEntries(ExplorerContextMenuEntry& entry);
+
+    /// <summary>
+    /// Sets the text in the Java instance to the specific value.
+    /// </summary>
+    /// <param name="value">The value to set.</param>
     void SetText(wstring& value);
+    
+    /// <summary>
+    /// Sets the help text in the Java instance to the specific value.
+    /// </summary>
+    /// <param name="value">The value to set.</param>
     void SetHelpText(wstring& value);
+    
+    /// <summary>
+    /// Sets the command ID in the Java instance to the specific value.
+    /// </summary>
+    /// <param name="value">The value to set.</param>
     void SetCommandId(int32_t value);
+    
+    /// <summary>
+    /// Sets the command string in the Java instance to the specific value.
+    /// </summary>
+    /// <param name="value">The value to set.</param>
     void SetCommandString(wstring& value);
+    
+    /// <summary>
+    /// Copies the image data from the bitmap handle to the java instance.
+    /// </summary>
+    /// <param name="value">The source bitmap handle.</param>
     void SetImageHandle(HBITMAP value);
-    ExplorerContextMenuEntry* GetNativeHandle();
-    void SetNativeHandle(ExplorerContextMenuEntry* value);
+    
+    /// <summary>
+    /// Sets the separator value in the Java instance to the specific value.
+    /// </summary>
+    /// <param name="value">The value to set.</param>
     void SetSeperator(bool value);
+    
+    /// <summary>
+    /// Adds the specific entry as child entry of the java instance.
+    /// </summary>
+    /// <param name="value">The child entry.</param>
     void AddEntry(JavaExplorerContextMenuEntry& value);
+  public:
+    
+    /// <summary>
+    /// Constructor for creating a C++ instance which wraps a new Java instance.
+    /// The Java instance is created during the constructor call.
+    /// </summary>
+    /// <param name="environment">The reference to the current Java environment.</param>
+    /// <param name="entry">The context menu entry from which the data are copied to the Java instance.</param>
+    JavaExplorerContextMenuEntry(JNIEnv* environment, ExplorerContextMenuEntry& entry);
+
+    /// <summary>
+    /// Constructor for creating a C++ instnace which wraps an existing Java instnace.
+    /// </summary>
+    /// <param name="environment">The reference to the current Java environment.</param>
+    /// <param name="entry">The context menu entry from which the data are copied to the Java instance.</param>
+    /// <param name="javaInstance">The Java instance which will be wrapped.</param>
+    JavaExplorerContextMenuEntry(JNIEnv* environment, jobject javaInstance);
+
+    /// <summary>
+    /// Copies the entries of an existing context menu to the Java environment.
+    /// The required Java instances are created during the the copy operation.
+    /// </summary>
+    /// <param name="entry">The source entry for the copy operation.</param>
+    void CopyEntries(ExplorerContextMenuEntry& entry);
+    
+    /// <summary>
+    /// Gets the address of the native instance from the Java instance.
+    /// </summary>
+    /// <returns>The entry with the address of natvie instance.</returns>
+    ExplorerContextMenuEntry* GetNativeHandle();
+
+    /// <summary>
+    /// Sets the address of the natvie instance in the Java instnace.
+    /// </summary>
+    /// <param name="value">The native instance.</param>
+    void SetNativeHandle(ExplorerContextMenuEntry* value);
   };
 }
 /***********************************************************************************************************************

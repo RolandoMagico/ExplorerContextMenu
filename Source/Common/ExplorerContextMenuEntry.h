@@ -36,30 +36,113 @@ using namespace std;
 ***********************************************************************************************************************/
 namespace ContextQuickie
 {
+  /// <summary>
+  /// This class represents one context menu entry.
+  /// </summary>
   class ExplorerContextMenuEntry
   {
   private:
+    /// <summary>
+    /// The context menu which contains this entry.
+    /// </summary>
     IContextMenu* ContextMenu = nullptr;
+
+    /// <summary>
+    /// The next position at which new items are inserted during menu creation.
+    /// </summary>
     uint32_t NextInsertPosition = 0;
+
+    /// <summary>
+    /// Add child entries to this entry.
+    /// </summary>
+    /// <param name="contextMenu">The context menu instance containing the child entries.</param>
+    /// <param name="menu">The menu containing the data of the child entries.</param>
+    /// <param name="isDefaultMenu">A value indicating whether the menu is the default menu or not.</param>
     void AddEntries(IContextMenu* contextMenu, HMENU menu, bool isDefaultMenu);
-    void ExtractBitmapData(HBITMAP bitmapHandle);
+
   public:
-    wstring* Text;
-    wstring* CommandString;
-    wstring* HelpText;
-    bool IsSeparator;
-    uint32_t CommandId;
-    uint32_t BitmapWidth;
-    uint32_t BitmapHeight;
-    HBITMAP BitmapHandle;
+    /// <summary>
+    /// The text of the entry.
+    /// </summary>
+    wstring* Text = nullptr;
+
+    /// <summary>
+    /// The help text of the entry.
+    /// </summary>
+    wstring* HelpText = nullptr;
+
+    /// <summary>
+    /// The command ID of the entry.
+    /// </summary>
+    uint32_t CommandId = 0;
+
+    /// <summary>
+    /// The command string of the entry
+    /// </summary>
+    wstring* CommandString = nullptr;
+
+    /// <summary>
+    /// Indicates wheter the entry is a separator or not.
+    /// </summary>
+    bool IsSeparator = false;
+
+    /// <summary>
+    /// The handle to the bitmap for this enty.
+    /// </summary>
+    HBITMAP BitmapHandle = nullptr;
+
+    /// <summary>
+    /// The child entries of this entry.
+    /// </summary>
     vector<ExplorerContextMenuEntry*> menuEntries;
+
+    /// <summary>
+    /// The default constructor.
+    /// </summary>
     ExplorerContextMenuEntry();
+
+    /// <summary>
+    /// The constructor for creating an entry for a specific context menu.
+    /// </summary>
+    /// <param name="contextMenu">The context menu interface which is used for this entry.</param>
+    /// <param name="menu">The menu which provides the data for this entry.</param>
+    /// <param name="index">The index of this entry in the menu.</param>
     ExplorerContextMenuEntry(IContextMenu* contextMenu, HMENU menu, int32_t index);
+
+    /// <summary>
+    /// The default destructor.
+    /// </summary>
     ~ExplorerContextMenuEntry();
+
+    /// <summary>
+    /// Gets the number of all entries including submenu entries.
+    /// </summary>
+    /// <returns></returns>
     size_t GetAllEntriesCount();
+
+    /// <summary>
+    /// Loads the child entries of this instance from the specific context menu interface.
+    /// </summary>
+    /// <param name="contextMenu">The context menu instance representing the child entries.</param>
+    /// <param name="flags">The flags which are used to query the conext menu.</param>
     void GetMenuData(IContextMenu* contextMenu, uint32_t flags);
+
+    /// <summary>
+    /// Executes the command for this entry.
+    /// </summary>
+    /// <param name="executeSynchronous">A value indicating whether the command is executed synchronously or not.
+    /// Note that synchronous execution is not supported by all context menu entries.</param>
     void ExecuteCommand(bool executeSynchronous = false);
+
+    /// <summary>
+    /// Prints the context menu to the console.
+    /// </summary>
+    /// <param name="level">The indentation level for printing the commands.</param>
     void PrintMenu(uint32_t level = 0);
+
+    /// <summary>
+    /// Removes duplicate separators and the separator at the end (if it exists) from the child entries.
+    /// </summary>
     void RemoveDuplicateSeparators();
   };
 }
