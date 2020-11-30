@@ -59,7 +59,6 @@ namespace ContextQuickie
 
   ExplorerContextMenuEntry::ExplorerContextMenuEntry()
   {
-
   }
 
   ExplorerContextMenuEntry::ExplorerContextMenuEntry(IContextMenu* contextMenu, HMENU menu, int32_t index)
@@ -154,7 +153,9 @@ namespace ContextQuickie
 
     if (this->BitmapHandle != nullptr)
     {
-      DeleteObject((HBITMAP)this->BitmapHandle);
+      // Do not delete the bitmap object. 
+      // Some extensions (e.g. TortoiseHg) use a bitmap cache which will crash if the bitmap is deleted
+      // DeleteObject(this->BitmapHandle);
     }
 
     if (this->Text != nullptr)

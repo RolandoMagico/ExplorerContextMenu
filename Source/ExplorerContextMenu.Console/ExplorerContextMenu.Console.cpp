@@ -63,8 +63,16 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
   }
 
   set<wstring> whitelist;
-  // 7-Zip: whitelist.insert(L"{23170F69-40C1-278A-1000-000100020000}");
-  // Notepad++: whitelist.insert(L"{B298D29A-A6ED-11DE-BA8C-A68E55D89593}");
+
+  // 7-Zip: 
+  // whitelist.insert(L"{23170F69-40C1-278A-1000-000100020000}");
+
+  // Notepad++: 
+  // whitelist.insert(L"{B298D29A-A6ED-11DE-BA8C-A68E55D89593}");
+
+  // TortoiseHg:
+  whitelist.insert(L"{46605027-5B8C-4DCE-BFE0-051B7972D64C}");
+
   ExplorerContextMenu contextMenu(paths, true, whitelist);
   contextMenu.PrintMenu();
   return 0;
