@@ -26,6 +26,7 @@
  INCLUDES
 ***********************************************************************************************************************/
 #pragma once
+#include "ExplorerContextMenu.h"
 #include "NetExplorerContextMenuEntry.h"
 
 /***********************************************************************************************************************
@@ -40,9 +41,15 @@ namespace ContextQuickie
   public ref class NetExplorerContextMenu : public NetExplorerContextMenuEntry
   {
   private:
-    int handle;
+    /// <summary>
+    /// Reference to the natvie entry of this instance.
+    /// </summary>
     ExplorerContextMenu* nativeMenu;
   public:
+    /// <summary>
+    /// Copies the data from a native entry to this instance.
+    /// </summary>
+    /// <param name="entry">A list of paths to files or folders for which the menu will be created.</param>
     NetExplorerContextMenu(List<String^>^ paths);
   };
 }
