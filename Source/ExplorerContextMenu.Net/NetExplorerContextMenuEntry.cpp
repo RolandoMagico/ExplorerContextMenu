@@ -75,7 +75,7 @@ namespace ContextQuickie
 
     if (this->nativeEntry->HelpText != nullptr)
     {
-      this->HelpText = gcnew String(this->nativeEntry->Text->c_str());
+      this->HelpText = gcnew String(this->nativeEntry->HelpText->c_str());
     }
 
     if (this->nativeEntry->CommandString != nullptr)

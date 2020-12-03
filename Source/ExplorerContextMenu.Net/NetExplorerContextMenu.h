@@ -49,7 +49,7 @@ namespace ContextQuickie
     /// <summary>
     /// Copies the data from a native entry to this instance.
     /// </summary>
-    /// <param name="entry">A list of paths to files or folders for which the menu will be created.</param>
+    /// <param name="paths">A list of paths to files or folders for which the menu will be created.</param>
     NetExplorerContextMenu(List<String^>^ paths);
   };
 }

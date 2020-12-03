@@ -4,6 +4,17 @@
         "ExplorerContextMenu.Net"
     </assembly>
     <members>
+        <member name="M:ContextQuickie.NetExplorerContextMenu.#ctor(System.Collections.Generic.List`1{System.String})">
+            <summary>
+Copies the data from a native entry to this instance.
+</summary>
+            <param name="paths">A list of paths to files or folders for which the menu will be created.</param>
+        </member>
+        <member name="F:ContextQuickie.NetExplorerContextMenu.nativeMenu">
+            <summary>
+Reference to the natvie entry of this instance.
+</summary>
+        </member>
         <member name="P:ContextQuickie.NetExplorerContextMenuEntry.Icon">
             <summary>
 Gets the icon of this entry.
