@@ -59,7 +59,7 @@ namespace ContextQuickie
   NetExplorerContextMenu::NetExplorerContextMenu(List<String^>^ paths)
   {
     vector<wstring> convertedPaths;
-    for each (String ^ path in paths)
+    for each (String^ path in paths)
     {
       convertedPaths.push_back(static_cast<wchar_t*>(Marshal::StringToHGlobalUni(path).ToPointer()));
     }

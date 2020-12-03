@@ -37,31 +37,94 @@ namespace ContextQuickie
   using namespace System::Collections::Generic;
   using namespace System::Drawing;
 
+  /// <summary>
+  /// This class represents one entry in a context menu.
+  /// </summary>
   public ref class NetExplorerContextMenuEntry
   {
   private:
+    /// <summary>
+    /// Backing storage for <see cref="Icon"/>.
+    /// </summary>
     Image^ icon;
+
+    /// <summary>
+    /// Reference to the natvie entry of this instance.
+    /// </summary>
     ExplorerContextMenuEntry* nativeEntry;
+
+    /// <summary>
+    /// Backing storage for <see cref="Childs"/>.
+    /// </summary>
     List<NetExplorerContextMenuEntry^>^ childs = gcnew List<NetExplorerContextMenuEntry^>();
 
-  internal:
+    /// <summary>
+    /// Creates a new instance of the <see cref="NetExplorerContextMenuEntry"/> class.
+    /// This constructor is used to wrap an existing instacne of a native context menu entry.
+    /// </summary>
+    /// <param name="entry">The native intsance which is wrapped.</param>
     NetExplorerContextMenuEntry(ExplorerContextMenuEntry* entry);
+
+  protected:
+    /// <summary>
+    /// Copies the data from a native entry to this instance.
+    /// </summary>
+    /// <param name="entry">The native instance from which the data is copied.</param>
     void CopyNativeData(ExplorerContextMenuEntry* entry);
 
   public:
+    /// <summary>
+    /// Creates a new instance of the <see cref="NetExplorerContextMenuEntry"/> class.
+    /// </summary>
     NetExplorerContextMenuEntry();
+
+    /// <summary>
+    /// Executes the context menu entry command.
+    /// </summary>
     void ExecuteCommand();
+
+    /// <summary>
+    /// Gets or sets the text of the entry.
+    /// </summary>
     property String^ Text;
+
+    /// <summary>
+    /// Gets or sets the help text of the entry.
+    /// </summary>
+    property String^ HelpText;
+
+    /// <summary>
+    /// Gets the command ID of the entry.
+    /// </summary>
+    property UInt32 CommandId
+    {
+      UInt32 get();
+    }
+
+    /// <summary>
+    /// Gets or sets the command string of the entry.
+    /// </summary>
+    property String^ CommandString;
+
+    /// <summary>
+    /// Gets a value indicating whether this instance is a seperator or not.
+    /// </summary>
     property Boolean IsSeperator
     {
       Boolean get();
     }
 
+    /// <summary>
+    /// Gets the child elements of this entry.
+    /// </summary>
     property IEnumerable<NetExplorerContextMenuEntry^>^ Childs
     {
       IEnumerable<NetExplorerContextMenuEntry^>^ get();
     }
 
+    /// <summary>
+    /// Gets the icon of this entry.
+    /// </summary>
     property Image^ Icon
     {
       Image^ get();

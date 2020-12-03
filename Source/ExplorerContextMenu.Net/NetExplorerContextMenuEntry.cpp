@@ -73,6 +73,16 @@ namespace ContextQuickie
       this->Text = gcnew String(this->nativeEntry->Text->c_str());
     }
 
+    if (this->nativeEntry->HelpText != nullptr)
+    {
+      this->HelpText = gcnew String(this->nativeEntry->Text->c_str());
+    }
+
+    if (this->nativeEntry->CommandString != nullptr)
+    {
+      this->CommandString = gcnew String(this->nativeEntry->CommandString->c_str());
+    }
+
     uint32_t width, height, planes, bitsPerPixel;
     if (this->nativeEntry->GetBitmapDimensions(width, height, planes, bitsPerPixel) == true)
     {
@@ -101,6 +111,11 @@ namespace ContextQuickie
     {
       this->nativeEntry->ExecuteCommand();
     }
+  }
+
+  UInt32 NetExplorerContextMenuEntry::CommandId::get()
+  {
+    return this->nativeEntry->CommandId;
   }
 
   Boolean NetExplorerContextMenuEntry::IsSeperator::get()

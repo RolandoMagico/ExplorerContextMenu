@@ -1,0 +1,254 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        "ExplorerContextMenu.Net"
+    </assembly>
+    <members>
+        <member name="P:ContextQuickie.NetExplorerContextMenuEntry.Icon">
+            <summary>
+Gets the icon of this entry.
+</summary>
+        </member>
+        <member name="P:ContextQuickie.NetExplorerContextMenuEntry.Childs">
+            <summary>
+Gets the child elements of this entry.
+</summary>
+        </member>
+        <member name="P:ContextQuickie.NetExplorerContextMenuEntry.IsSeperator">
+            <summary>
+Gets a value indicating whether this instance is a seperator or not.
+</summary>
+        </member>
+        <member name="P:ContextQuickie.NetExplorerContextMenuEntry.CommandString">
+            <summary>
+Gets or sets the command string of the entry.
+</summary>
+        </member>
+        <member name="P:ContextQuickie.NetExplorerContextMenuEntry.CommandId">
+            <summary>
+Gets the command ID of the entry.
+</summary>
+        </member>
+        <member name="P:ContextQuickie.NetExplorerContextMenuEntry.HelpText">
+            <summary>
+Gets or sets the help text of the entry.
+</summary>
+        </member>
+        <member name="P:ContextQuickie.NetExplorerContextMenuEntry.Text">
+            <summary>
+Gets or sets the text of the entry.
+</summary>
+        </member>
+        <member name="M:ContextQuickie.NetExplorerContextMenuEntry.ExecuteCommand">
+            <summary>
+Executes the context menu entry command.
+</summary>
+        </member>
+        <member name="M:ContextQuickie.NetExplorerContextMenuEntry.#ctor">
+            <summary>
+Creates a new instance of the <see cref="T:ContextQuickie.NetExplorerContextMenuEntry" /> class.
+</summary>
+        </member>
+        <member name="M:ContextQuickie.NetExplorerContextMenuEntry.CopyNativeData(ContextQuickie.ExplorerContextMenuEntry*)">
+            <summary>
+Copies the data from a native entry to this instance.
+</summary>
+            <param name="entry">The native instance from which the data is copied.</param>
+        </member>
+        <member name="M:ContextQuickie.NetExplorerContextMenuEntry.#ctor(ContextQuickie.ExplorerContextMenuEntry*)">
+            <summary>
+Creates a new instance of the <see cref="T:ContextQuickie.NetExplorerContextMenuEntry" /> class.
+This constructor is used to wrap an existing instacne of a native context menu entry.
+</summary>
+            <param name="entry">The native intsance which is wrapped.</param>
+        </member>
+        <member name="F:ContextQuickie.NetExplorerContextMenuEntry.childs">
+            <summary>
+Backing storage for <see cref="P:ContextQuickie.NetExplorerContextMenuEntry.Childs" />.
+</summary>
+        </member>
+        <member name="F:ContextQuickie.NetExplorerContextMenuEntry.nativeEntry">
+            <summary>
+Reference to the natvie entry of this instance.
+</summary>
+        </member>
+        <member name="F:ContextQuickie.NetExplorerContextMenuEntry.icon">
+            <summary>
+Backing storage for <see cref="P:ContextQuickie.NetExplorerContextMenuEntry.Icon" />.
+</summary>
+        </member>
+        <member name="T:ContextQuickie.NetExplorerContextMenuEntry">
+            <summary>
+This class represents one entry in a context menu.
+</summary>
+        </member>
+        <member name="M:ContextQuickie.ExplorerContextMenu.#ctor(std.vector&lt;std.basic_string&lt;System.Char,std.char_traits{System.Char},std.allocator&lt;System.Char&gt;&gt;,std.allocator&lt;std.basic_string&lt;System.Char,std.char_traits{System.Char},std.allocator&lt;System.Char&gt;&gt;&gt;&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,System.Boolean,std.set&lt;std.basic_string&lt;System.Char,std.char_traits{System.Char},std.allocator&lt;System.Char&gt;&gt;,std.less&lt;std.basic_string&lt;System.Char,std.char_traits{System.Char},std.allocator&lt;System.Char&gt;&gt;&gt;,std.allocator&lt;std.basic_string&lt;System.Char,std.char_traits{System.Char},std.allocator&lt;System.Char&gt;&gt;&gt;&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary>
+Constructor which creates the context menu.
+</summary>
+            <param name="paths">A list of paths for which the context menu will be created.</param>
+            <param name="createDefaultMenu">A value indicating whether the default menu will be loaded or not.</param>
+            <param name="extendedMenuWhitelist">A list of context menu extension CLSIDs which are loaded. If the list is empty, all available extensions are loaded.</param>
+        </member>
+        <member name="M:ContextQuickie.ExplorerContextMenu.GetExtendedContextMenu(IShellFolder*,_ITEMIDLIST!System.Runtime.CompilerServices.IsConst**,System.UInt32,std.set&lt;std.basic_string&lt;System.Char,std.char_traits{System.Char},std.allocator&lt;System.Char&gt;&gt;,std.less&lt;std.basic_string&lt;System.Char,std.char_traits{System.Char},std.allocator&lt;System.Char&gt;&gt;&gt;,std.allocator&lt;std.basic_string&lt;System.Char,std.char_traits{System.Char},std.allocator&lt;System.Char&gt;&gt;&gt;&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary>
+Loads the extended explorer context menu.
+The extended menu contains the entris which are specified by shell extensions in the registry.
+</summary>
+            <param name="desktop">A reference to the desktop folder which is used as the parent element for all files/folders.</param>
+            <param name="itemIdList">A list of file system items for which the menu will be created.</param>
+            <param name="itemIdListLength">The number of items in <see paramref="itemIdList" /></param>
+            <param name="extendedMenuWhitelist">A list of context menu extension CLSIDs which are loaded. If the list is empty, all available extensions are loaded.</param>
+            <returns>A value indicating whether loading the default context menu was successful or not.</returns>
+        </member>
+        <member name="M:ContextQuickie.ExplorerContextMenu.GetDefaultContextMenu(IShellFolder*,_ITEMIDLIST!System.Runtime.CompilerServices.IsConst**,System.UInt32)">
+            <summary>
+Loads the default explorer context menu.
+</summary>
+            <param name="desktop">A reference to the desktop folder which is used as the parent element for all files/folders.</param>
+            <param name="itemIdList">A list of file system items for which the menu will be created.</param>
+            <param name="itemIdListLength">The number of items in <see paramref="itemIdList" /></param>
+            <returns>A value indicating whether loading the default context menu was successful or not.</returns>
+        </member>
+        <member name="F:ContextQuickie.ExplorerContextMenu.shellExtensions">
+            <summary>
+A list with loaded shell extensions during menu creation.
+</summary>
+        </member>
+        <member name="T:ContextQuickie.ExplorerContextMenu">
+            <summary>
+This class represents the root element of a context menu.
+</summary>
+        </member>
+        <member name="M:ContextQuickie.ExplorerContextMenuEntry.RemoveDuplicateSeparators">
+            <summary>
+Removes duplicate separators and the separator at the end (if it exists) from the child entries.
+</summary>
+        </member>
+        <member name="M:ContextQuickie.ExplorerContextMenuEntry.PrintMenu(System.UInt32)">
+            <summary>
+Prints the context menu to the console.
+</summary>
+            <param name="level">The indentation level for printing the commands.</param>
+        </member>
+        <member name="M:ContextQuickie.ExplorerContextMenuEntry.ExecuteCommand(System.Boolean)">
+            <summary>
+Executes the command for this entry.
+</summary>
+            <param name="executeSynchronous">A value indicating whether the command is executed synchronously or not.
+Note that synchronous execution is not supported by all context menu entries.</param>
+        </member>
+        <member name="M:ContextQuickie.ExplorerContextMenuEntry.GetBitmapPixelData(System.UInt32,System.UInt32,System.UInt32,System.UInt32,System.Void*)">
+            <summary>
+Gets the pixel data of the bitmap image for this entry.
+</summary>
+            <param name="width">The image width.</param>
+            <param name="height">The image height.</param>
+            <param name="planes">The number of planes of the image.</param>
+            <param name="bitsPerPixel">The bits per pixel of the image.</param>
+            <param name="destination">A pointer to the buffer where the image data will be copied to.</param>
+            <returns>
+                <c>true</c> if the image data could be retrieved; otherwise <c>false</c>.</returns>
+        </member>
+        <member name="M:ContextQuickie.ExplorerContextMenuEntry.GetBitmapDimensions(System.UInt32*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,System.UInt32*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,System.UInt32*!System.Runtime.CompilerServices.IsImplicitlyDereferenced,System.UInt32*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary>
+Gets the dimensions of the bitmap image for this entry.
+</summary>
+            <param name="width">Reference to store the image width.</param>
+            <param name="height">Reference to store the image height.</param>
+            <param name="planes">Reference to store the number of planes of the image.</param>
+            <param name="bitsPerPixel">Reference to store bits per pixel of the image.</param>
+            <returns>
+                <c>true</c> if the image data could be retrieved; otherwise <c>false</c>.</returns>
+        </member>
+        <member name="M:ContextQuickie.ExplorerContextMenuEntry.GetMenuData(IContextMenu*,System.UInt32)">
+            <summary>
+Loads the child entries of this instance from the specific context menu interface.
+</summary>
+            <param name="contextMenu">The context menu instance representing the child entries.</param>
+            <param name="flags">The flags which are used to query the conext menu.</param>
+        </member>
+        <member name="M:ContextQuickie.ExplorerContextMenuEntry.GetAllEntriesCount">
+            <summary>
+Gets the number of all entries including submenu entries.
+</summary>
+            <returns />
+        </member>
+        <member name="M:ContextQuickie.ExplorerContextMenuEntry.Dispose">
+            <summary>
+The default destructor.
+</summary>
+        </member>
+        <member name="M:ContextQuickie.ExplorerContextMenuEntry.#ctor(IContextMenu*,HMENU__*,System.Int32)">
+            <summary>
+The constructor for creating an entry for a specific context menu.
+</summary>
+            <param name="contextMenu">The context menu interface which is used for this entry.</param>
+            <param name="menu">The menu which provides the data for this entry.</param>
+            <param name="index">The index of this entry in the menu.</param>
+        </member>
+        <member name="M:ContextQuickie.ExplorerContextMenuEntry.#ctor">
+            <summary>
+The default constructor.
+</summary>
+        </member>
+        <member name="F:ContextQuickie.ExplorerContextMenuEntry.menuEntries">
+            <summary>
+The child entries of this entry.
+</summary>
+        </member>
+        <member name="F:ContextQuickie.ExplorerContextMenuEntry.IsSeparator">
+            <summary>
+Indicates wheter the entry is a separator or not.
+</summary>
+        </member>
+        <member name="F:ContextQuickie.ExplorerContextMenuEntry.CommandString">
+            <summary>
+The command string of the entry
+</summary>
+        </member>
+        <member name="F:ContextQuickie.ExplorerContextMenuEntry.CommandId">
+            <summary>
+The command ID of the entry.
+</summary>
+        </member>
+        <member name="F:ContextQuickie.ExplorerContextMenuEntry.HelpText">
+            <summary>
+The help text of the entry.
+</summary>
+        </member>
+        <member name="F:ContextQuickie.ExplorerContextMenuEntry.Text">
+            <summary>
+The text of the entry.
+</summary>
+        </member>
+        <member name="M:ContextQuickie.ExplorerContextMenuEntry.AddEntries(IContextMenu*,HMENU__*,System.Boolean)">
+            <summary>
+Add child entries to this entry.
+</summary>
+            <param name="contextMenu">The context menu instance containing the child entries.</param>
+            <param name="menu">The menu containing the data of the child entries.</param>
+            <param name="isDefaultMenu">A value indicating whether the menu is the default menu or not.</param>
+        </member>
+        <member name="F:ContextQuickie.ExplorerContextMenuEntry.NextInsertPosition">
+            <summary>
+The next position at which new items are inserted during menu creation.
+</summary>
+        </member>
+        <member name="F:ContextQuickie.ExplorerContextMenuEntry.ContextMenu">
+            <summary>
+The context menu which contains this entry.
+</summary>
+        </member>
+        <member name="F:ContextQuickie.ExplorerContextMenuEntry.BitmapHandle">
+            <summary>
+The handle to the bitmap for this enty.
+</summary>
+        </member>
+        <member name="T:ContextQuickie.ExplorerContextMenuEntry">
+            <summary>
+This class represents one context menu entry.
+</summary>
+        </member>
+    </members>
+</doc>
