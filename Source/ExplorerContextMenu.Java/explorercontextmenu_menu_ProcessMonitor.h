@@ -10,7 +10,7 @@ extern "C" {
 /*
  * Class:     explorercontextmenu_menu_ProcessMonitor
  * Method:    getCurrentChildProcesses
- * Signature: ()[Ljava/lang/String;
+ * Signature: ()[Lexplorercontextmenu/menu/ProcessInfo;
  */
 JNIEXPORT jobjectArray JNICALL Java_explorercontextmenu_menu_ProcessMonitor_getCurrentChildProcesses
   (JNIEnv *, jobject);
