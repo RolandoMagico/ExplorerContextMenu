@@ -117,6 +117,7 @@ namespace ContextMenu
       {
         ToolStripMenuItem toolStripMenuItem = new ToolStripMenuItem(entry.Text);
         toolStripMenuItem.Tag = entry;
+        toolStripMenuItem.ToolTipText = entry.HelpText;
         if (entry.Childs.Any())
         {
           foreach (NetExplorerContextMenuEntry childEntry in entry.Childs)
