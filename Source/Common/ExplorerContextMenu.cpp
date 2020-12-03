@@ -78,10 +78,11 @@ namespace ContextQuickie
     {
       // Unable to retrive desktop opbject :-(
     }
-    else if ((itemIdList = (ITEMIDLIST**)CoTaskMemAlloc(paths.size() * sizeof(ITEMIDLIST*))) != NULL)
+    else
     {
       this->shellExtensions.push_back(desktop);
       itemIdListLength = (UINT)paths.size();
+      itemIdList = new ITEMIDLIST * [paths.size()];
       for (size_t pathIndex = 0; (pathIndex < paths.size()) && SUCCEEDED(result); pathIndex++)
       {
         result = desktop->ParseDisplayName(NULL, NULL, (LPWSTR)paths[pathIndex].c_str(), nullptr, &(itemIdList[pathIndex]), NULL);
@@ -113,10 +114,7 @@ namespace ContextQuickie
 
     if (itemIdList != nullptr)
     {
-      for (uint32_t i = 0; i < itemIdListLength; i++)
-      {
-        CoTaskMemFree(&(itemIdList[i]));
-      }
+      delete[] itemIdList;
     }
   }
 
