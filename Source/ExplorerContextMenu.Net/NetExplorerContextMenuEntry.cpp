@@ -52,6 +52,8 @@
 ***********************************************************************************************************************/
 namespace ContextQuickie
 {
+  using namespace System::Drawing::Imaging;
+
   NetExplorerContextMenuEntry::NetExplorerContextMenuEntry()
   {
   }
@@ -71,11 +73,18 @@ namespace ContextQuickie
       this->Text = gcnew String(this->nativeEntry->Text->c_str());
     }
 
-    if (this->nativeEntry->BitmapHandle != nullptr)
+    uint32_t width, height, planes, bitsPerPixel;
+    if (this->nativeEntry->GetBitmapDimensions(width, height, planes, bitsPerPixel) == true)
     {
-      Bitmap^ bitmap = Bitmap::FromHbitmap(IntPtr(this->nativeEntry->BitmapHandle));
-      bitmap->MakeTransparent();
-      this->icon = bitmap;
+      Bitmap^ bitmap = gcnew Bitmap(width, height);
+      System::Drawing::Rectangle rectangle = System::Drawing::Rectangle(0, 0, width, height);
+      BitmapData^ bitmapData = bitmap->LockBits(rectangle, ImageLockMode::ReadWrite, PixelFormat::Format32bppArgb);
+      if (this->nativeEntry->GetBitmapPixelData(width, height, planes, bitsPerPixel, bitmapData->Scan0.ToPointer()) == true)
+      {
+        this->icon = bitmap;
+      }
+
+      bitmap->UnlockBits(bitmapData);
     }
 
     // Create child entries

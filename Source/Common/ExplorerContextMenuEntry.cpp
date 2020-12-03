@@ -219,6 +219,67 @@ namespace ContextQuickie
     DestroyMenu(menu);
   }
 
+  bool ExplorerContextMenuEntry::GetBitmapDimensions(uint32_t& width, uint32_t& height, uint32_t& planes, uint32_t& bitsPerPixel)
+  {
+    bool result = false;
+    BITMAP bitmap = { 0 };
+    if (this->BitmapHandle == nullptr)
+    {
+      // This entry doesn't have an image
+    }
+    else if (GetObject(this->BitmapHandle, sizeof(bitmap), &bitmap) == 0)
+    {
+      // GetObject failed
+    }
+    else
+    {
+      width = bitmap.bmWidth;
+      height = bitmap.bmHeight;
+      planes = bitmap.bmPlanes;
+      bitsPerPixel = bitmap.bmBitsPixel;
+      result = true;
+    }
+
+    return result;
+  }
+
+  bool ExplorerContextMenuEntry::GetBitmapPixelData(uint32_t width, uint32_t height, uint32_t planes, uint32_t bitsPerPixel, void* destination)
+  {
+    bool result = false;
+    HDC deviceContextHandle = nullptr;
+
+    BITMAPINFO bitmapInfo = { 0 };
+    bitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bitmapInfo.bmiHeader.biWidth = width;
+    bitmapInfo.bmiHeader.biHeight = height * -1;
+    bitmapInfo.bmiHeader.biPlanes = planes;
+    bitmapInfo.bmiHeader.biBitCount = bitsPerPixel;
+
+    if (this->BitmapHandle == nullptr)
+    {
+      // This entry doesn't have an image
+    }
+    else if ((deviceContextHandle = GetDC(HWND_DESKTOP)) == NULL)
+    {
+      // GetDC failed
+    }
+    else if (GetDIBits(deviceContextHandle, this->BitmapHandle, 0, height, destination, &bitmapInfo, DIB_RGB_COLORS) == 0)
+    {
+      // GetDIBits failed
+    }
+    else
+    {
+      result = true;
+    }
+
+    if (deviceContextHandle != nullptr)
+    {
+      ReleaseDC(HWND_DESKTOP, deviceContextHandle);
+    }
+
+    return result;
+  }
+
   void ExplorerContextMenuEntry::ExecuteCommand(bool executeSynchronous)
   {
     if (this->ContextMenu != nullptr)

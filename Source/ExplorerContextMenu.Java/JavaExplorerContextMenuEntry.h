@@ -120,8 +120,8 @@ namespace ContextQuickie
     /// <summary>
     /// Copies the image data from the bitmap handle to the java instance.
     /// </summary>
-    /// <param name="value">The source bitmap handle.</param>
-    void SetImageHandle(HBITMAP value);
+    /// <param name="entry">The context menu entry from which the data are copied to the Java instance.</param>
+    void SetImageHandle(ExplorerContextMenuEntry& entry);
     
     /// <summary>
     /// Sets the separator value in the Java instance to the specific value.

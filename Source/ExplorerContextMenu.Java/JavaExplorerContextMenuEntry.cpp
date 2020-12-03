@@ -75,10 +75,7 @@ JavaExplorerContextMenuEntry::JavaExplorerContextMenuEntry(JNIEnv* environment, 
     this->SetHelpText(*(entry.HelpText));
   }
 
-  if (entry.BitmapHandle != nullptr)
-  {
-    this->SetImageHandle(entry.BitmapHandle);
-  }
+  this->SetImageHandle(entry);
 
   if (entry.CommandString != nullptr)
   {
@@ -130,41 +127,20 @@ void JavaExplorerContextMenuEntry::SetCommandString(wstring& value)
   this->InvokeStringSetterMethod("setCommandString", value);
 }
 
-void JavaExplorerContextMenuEntry::SetImageHandle(HBITMAP value)
+void JavaExplorerContextMenuEntry::SetImageHandle(ExplorerContextMenuEntry& entry)
 {
-  HDC deviceContextHandle;
-  BITMAP bitmap = { 0 };
-  if ((deviceContextHandle = GetDC(HWND_DESKTOP)) == NULL)
+  uint32_t width, height, planes, bitsPerPixel;
+  if (entry.GetBitmapDimensions(width, height, planes, bitsPerPixel) == true)
   {
-    // GetDC failed
-  }
-  else if (GetObject(value, sizeof(bitmap), &bitmap) == 0)
-  {
-    // GetObject failed
-  }
-  else
-  {
-    BITMAPINFO bitmapInfo = { 0 };
-    bitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    bitmapInfo.bmiHeader.biWidth = bitmap.bmWidth;
-    bitmapInfo.bmiHeader.biHeight = bitmap.bmHeight * -1;
-    bitmapInfo.bmiHeader.biPlanes = bitmap.bmPlanes;
-    bitmapInfo.bmiHeader.biBitCount = bitmap.bmBitsPixel;
-
-    size_t arraySize = (size_t)bitmap.bmWidth * bitmap.bmHeight * 4;
+    size_t arraySize = (size_t)width * height * 4;
     vector<int8_t> pixels(arraySize);
-    if (GetDIBits(deviceContextHandle, value, 0, bitmap.bmHeight, &pixels[0], &bitmapInfo, DIB_RGB_COLORS) != 0)
+    if (entry.GetBitmapPixelData(width, height, planes, bitsPerPixel, &pixels[0]) == true)
     {
-      this->InvokeIntSetterMethod("setImageDepth", bitmap.bmBitsPixel);
-      this->InvokeIntSetterMethod("setImageHeigth", bitmap.bmHeight);
-      this->InvokeIntSetterMethod("setImageWidth", bitmap.bmWidth);
+      this->InvokeIntSetterMethod("setImageDepth", bitsPerPixel);
+      this->InvokeIntSetterMethod("setImageHeigth", height);
+      this->InvokeIntSetterMethod("setImageWidth", width);
       this->InvokeByteArraySetterMethod("setImageData", pixels);
     }
-  }
-
-  if (deviceContextHandle != NULL)
-  {
-    ReleaseDC(HWND_DESKTOP, deviceContextHandle);
   }
 }
 

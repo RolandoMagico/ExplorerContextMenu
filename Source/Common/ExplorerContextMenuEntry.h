@@ -43,6 +43,11 @@ namespace ContextQuickie
   {
   private:
     /// <summary>
+    /// The handle to the bitmap for this enty.
+    /// </summary>
+    HBITMAP BitmapHandle = nullptr;
+
+    /// <summary>
     /// The context menu which contains this entry.
     /// </summary>
     IContextMenu* ContextMenu = nullptr;
@@ -87,11 +92,6 @@ namespace ContextQuickie
     bool IsSeparator = false;
 
     /// <summary>
-    /// The handle to the bitmap for this enty.
-    /// </summary>
-    HBITMAP BitmapHandle = nullptr;
-
-    /// <summary>
     /// The child entries of this entry.
     /// </summary>
     vector<ExplorerContextMenuEntry*> menuEntries;
@@ -126,6 +126,27 @@ namespace ContextQuickie
     /// <param name="contextMenu">The context menu instance representing the child entries.</param>
     /// <param name="flags">The flags which are used to query the conext menu.</param>
     void GetMenuData(IContextMenu* contextMenu, uint32_t flags);
+
+    /// <summary>
+    /// Gets the dimensions of the bitmap image for this entry.
+    /// </summary>
+    /// <param name="width">Reference to store the image width.</param>
+    /// <param name="height">Reference to store the image height.</param>
+    /// <param name="planes">Reference to store the number of planes of the image.</param>
+    /// <param name="bitsPerPixel">Reference to store bits per pixel of the image.</param>
+    /// <returns><c>true</c> if the image data could be retrieved; otherwise <c>false</c>.</returns>
+    bool GetBitmapDimensions(uint32_t& width, uint32_t& height, uint32_t& planes, uint32_t& bitsPerPixel);
+
+    /// <summary>
+    /// Gets the pixel data of the bitmap image for this entry.
+    /// </summary>
+    /// <param name="width">The image width.</param>
+    /// <param name="height">The image height.</param>
+    /// <param name="planes">The number of planes of the image.</param>
+    /// <param name="bitsPerPixel">The bits per pixel of the image.</param>
+    /// <param name="destination">A pointer to the buffer where the image data will be copied to.</param>
+    /// <returns><c>true</c> if the image data could be retrieved; otherwise <c>false</c>.</returns>
+    bool GetBitmapPixelData(uint32_t width, uint32_t height, uint32_t planes, uint32_t bitsPerPixel, void* destination);
 
     /// <summary>
     /// Executes the command for this entry.
