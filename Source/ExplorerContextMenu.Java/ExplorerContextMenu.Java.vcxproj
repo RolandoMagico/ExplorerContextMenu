@@ -172,7 +172,6 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="ExplorerContextMenu.Java.cpp" />
     <ClCompile Include="JavaExplorerContextMenuEntry.cpp" />
-    <ClCompile Include="ProcessMonitor.Java.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\ExplorerContextMenu.h" />
