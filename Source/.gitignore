@@ -9,4 +9,6 @@
 /ExplorerContextMenu*/bin/Release/*/*.lib
 /ExplorerContextMenu*/bin/Release/*/*.pdb
 /ExplorerContextMenu*/bin/Release/*/*.metagen
+/ExplorerContextMenu*.Tests/bin
+/ExplorerContextMenu*.Tests/Properties/launchSettings.json
 /ExplorerContextMenu.Java/**/*.class
