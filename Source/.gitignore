@@ -13,3 +13,4 @@
 /ExplorerContextMenu*.Tests/bin
 /ExplorerContextMenu*.Tests/Properties/launchSettings.json
 /ExplorerContextMenu.Java/**/*.class
+/ExplorerContextMenu.Java.Tests/libraries/
