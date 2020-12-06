@@ -71,6 +71,13 @@ namespace ContextQuickie
     /// <returns>A value indicating whether loading the default context menu was successful or not.</returns>
     HRESULT GetExtendedContextMenu(IShellFolder* desktop, LPCITEMIDLIST* itemIdList, UINT itemIdListLength, const set<wstring>& extendedMenuWhitelist);
 
+    /// <summary>
+    /// Gets the CLSIDs for all installed context menu extensions from the registry.
+    /// </summary>
+    /// <param name="target">A list in which the CLSIDs are stored.</param>
+    /// <returns><c>true</c> if retrieving the CLSIDs from the registry was successful; otherwise <c>false</c>.</returns>
+    bool GetAvailableMenuExtensions(vector<wstring>& target);
+
   public:
     /// <summary>
     /// Constructor which creates the context menu.

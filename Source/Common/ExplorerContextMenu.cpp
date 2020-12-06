@@ -151,17 +151,81 @@ namespace ContextQuickie
   {
     HRESULT result = S_OK;
     IDataObject* dataObject = nullptr;
+    HKEY contextMenuHandlers = nullptr;
+    const wstring registryPath(L"*\\shellex\\ContextMenuHandlers");
+    DWORD numberOfSubKey = 0;
+    DWORD subKeyMaxLength = 0;
+    vector<wstring> extensions;
+
+    if (this->GetAvailableMenuExtensions(extensions) == false)
+    {
+      // Unalbe to read context menu extensions from registry
+    }
+    else if (extensions.size() == 0)
+    {
+      // No extensions availabe, nothing more to do
+    }
+    else if (FAILED(result = desktop->GetUIObjectOf(NULL, itemIdListLength, itemIdList, IID_IDataObject, NULL, (void**)&dataObject)))
+    {
+      // Unable to retrieve data object :-(
+    }
+    else
+    {
+      for (size_t extensionIndex = 0; extensionIndex < extensions.size(); extensionIndex++)
+      {
+        // Convert string to CLSID. 
+        // Because coversion to GUID is already tested in GetAvailableMenuExtensions, no return value check is required here
+        GUID CLSID_NewMenu;
+        (void)CLSIDFromString(extensions.at(extensionIndex).c_str(), &CLSID_NewMenu);
+
+        if ((extendedMenuWhitelist.empty() || (extendedMenuWhitelist.find(extensions.at(extensionIndex).c_str()) != extendedMenuWhitelist.end())))
+        {
+          IShellExtInit* shellExtInit;
+          if (FAILED(result = CoCreateInstance(CLSID_NewMenu, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellExtInit))))
+          {
+            // Failed to create an IShellExtInit instance :-(
+          }
+          else if (FAILED(result = shellExtInit->Initialize(NULL, dataObject, NULL)))
+          {
+            // Failed to initialied the shell extension
+            shellExtInit->Release();
+          }
+          else
+          {
+            this->shellExtensions.push_back(shellExtInit);
+            IContextMenu* contextMenu;
+            if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_PPV_ARGS(&contextMenu))))
+            {
+              this->GetMenuData(contextMenu, CMF_NORMAL);
+            }
+          }
+        }
+      }
+    }
+ 
+    if (dataObject != nullptr)
+    {
+      dataObject->Release();
+    }
+
+    if (contextMenuHandlers != nullptr)
+    {
+      RegCloseKey(contextMenuHandlers);
+    }
+    return result;
+  }
+
+  bool ExplorerContextMenu::GetAvailableMenuExtensions(vector<wstring>& target)
+  {
+    HRESULT result = S_OK;
     LSTATUS registryResult;
     HKEY contextMenuHandlers = nullptr;
     const wstring registryPath(L"*\\shellex\\ContextMenuHandlers");
     DWORD numberOfSubKey = 0;
     DWORD subKeyMaxLength = 0;
+    bool returnValue = false;
 
-    if (FAILED(result = desktop->GetUIObjectOf(NULL, itemIdListLength, itemIdList, IID_IDataObject, NULL, (void**)&dataObject)))
-    {
-      // Unable to retrieve data object :-(
-    }
-    else if ((registryResult = RegOpenKeyEx(HKEY_CLASSES_ROOT, registryPath.c_str(), 0, KEY_READ, &contextMenuHandlers)) != ERROR_SUCCESS)
+    if ((registryResult = RegOpenKeyEx(HKEY_CLASSES_ROOT, registryPath.c_str(), 0, KEY_READ, &contextMenuHandlers)) != ERROR_SUCCESS)
     {
       // Unable to open registry :-(
     }
@@ -189,6 +253,7 @@ namespace ContextQuickie
         }
         else
         {
+          returnValue = true;
           // Convert string to CLSID. As some plugins use the registry key name for the ID and some use the registry value, try both
           GUID CLSID_NewMenu;
           wchar_t* clsidString = nullptr;
@@ -201,47 +266,20 @@ namespace ContextQuickie
             clsidString = registryKeyName;
           }
 
-          if (SUCCEEDED(result) && 
-              (extendedMenuWhitelist.empty() || (extendedMenuWhitelist.find(clsidString) != extendedMenuWhitelist.end())))
+          if (SUCCEEDED(result))
           {
-            IShellExtInit* shellExtInit;
-            if (FAILED(result = CoCreateInstance(CLSID_NewMenu, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellExtInit))))
-            {
-              // Failed to create an IShellExtInit instance :-(
-            }
-            else if (FAILED(result = shellExtInit->Initialize(NULL, dataObject, NULL)))
-            {
-              // Failed to initialied the shell extension
-              shellExtInit->Release();
-            }
-            else
-            {
-              this->shellExtensions.push_back(shellExtInit);
-              IContextMenu* contextMenu;
-              if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_PPV_ARGS(&contextMenu))))
-              {
-                this->GetMenuData(contextMenu, CMF_NORMAL);
-              }
-            }
+            target.push_back(clsidString);
           }
         }
 
         delete[] registryKeyName;
       }
     }
- 
-    if (dataObject != nullptr)
-    {
-      dataObject->Release();
-    }
 
-    if (contextMenuHandlers != nullptr)
-    {
-      RegCloseKey(contextMenuHandlers);
-    }
-    return result;
+    return returnValue;
   }
 }
+
 /***********************************************************************************************************************
  EOF
 ***********************************************************************************************************************/
