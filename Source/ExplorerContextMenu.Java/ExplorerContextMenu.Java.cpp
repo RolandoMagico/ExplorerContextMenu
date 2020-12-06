@@ -70,6 +70,7 @@ static void Java_explorercontextmenu_menu_CopyStringArrayToVector(JNIEnv* env, j
     }
   }
 }
+
 JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenu_getEntries(JNIEnv* env, jobject instance, jobjectArray paths, jboolean createDefaultMenu, jobjectArray extendedMenuWhitelist)
 {
   vector<wstring> convertedPaths;
