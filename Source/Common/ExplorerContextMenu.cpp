@@ -28,6 +28,7 @@
 #include "ExplorerContextMenu.h"
 #include "objbase.h"
 #include "shlobj_core.h"
+#include <algorithm>
 #pragma unmanaged
 
 /***********************************************************************************************************************
@@ -171,17 +172,33 @@ namespace ContextQuickie
     }
     else
     {
+      // Change all entreis to lower case
+      set<wstring> whitelistLowerCase;
+      for (wstring entry : extendedMenuWhitelist)
+      {
+        std::transform(entry.begin(), entry.end(), entry.begin(), ::towlower);
+        whitelistLowerCase.insert(entry);
+      }
+
+      set<wstring> blacklistLowerCase;
+      for (wstring entry : extendedMenuBlacklist)
+      {
+        std::transform(entry.begin(), entry.end(), entry.begin(), ::towlower);
+        blacklistLowerCase.insert(entry);
+      }
+
       for (wstring extension : extensions)
       {
-        // Convert string to CLSID. 
-        // Because coversion to GUID is already tested in GetAvailableMenuExtensions, no return value check is required here
-        GUID CLSID_NewMenu;
-        (void)CLSIDFromString(extension.c_str(), &CLSID_NewMenu);
-
-        if ((extendedMenuWhitelist.empty() || (extendedMenuWhitelist.find(extension) != extendedMenuWhitelist.end())))
+        std::transform(extension.begin(), extension.end(), extension.begin(), ::towlower);
+        if ((whitelistLowerCase.empty() || (whitelistLowerCase.find(extension) != whitelistLowerCase.end())))
         {
-          if (extendedMenuBlacklist.find(extension) == extendedMenuBlacklist.end())
+          if (blacklistLowerCase.find(extension) == blacklistLowerCase.end())
           {
+            // Convert string to CLSID. 
+            // Because coversion to GUID is already tested in GetAvailableMenuExtensions, no return value check is required here
+            GUID CLSID_NewMenu;
+            (void)CLSIDFromString(extension.c_str(), &CLSID_NewMenu);
+
             IShellExtInit* shellExtInit;
             if (FAILED(result = CoCreateInstance(CLSID_NewMenu, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellExtInit))))
             {
