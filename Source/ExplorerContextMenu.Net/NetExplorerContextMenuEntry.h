@@ -81,7 +81,10 @@ namespace ContextQuickie
     /// <summary>
     /// Executes the context menu entry command.
     /// </summary>
-    void ExecuteCommand();
+    /// <param name="windowHandle">The handle to the window which executes the command.</param>
+    /// <returns>0 if the execution was successful, INT32_MIN if no valid context menu instance exist 
+    /// or the HRESULT code from the call to InvokeCommand.</returns>
+    Int32 ExecuteCommand(IntPtr windowHandle);
 
     /// <summary>
     /// Gets or sets the text of the entry.

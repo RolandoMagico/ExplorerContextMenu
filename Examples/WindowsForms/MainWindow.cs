@@ -102,7 +102,7 @@ namespace ContextMenu
     {
       if ((sender is ToolStripItem toolStripItem) && (toolStripItem.Tag is NetExplorerContextMenuEntry entry))
       {
-        entry.ExecuteCommand();
+        entry.ExecuteCommand(this.Handle);
       }
     }
 

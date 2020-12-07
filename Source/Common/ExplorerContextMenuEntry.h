@@ -84,7 +84,7 @@ namespace ContextQuickie
     /// <summary>
     /// The command string of the entry
     /// </summary>
-    wstring* CommandString = nullptr;
+    string* CommandString = nullptr;
 
     /// <summary>
     /// Indicates wheter the entry is a separator or not.
@@ -151,9 +151,12 @@ namespace ContextQuickie
     /// <summary>
     /// Executes the command for this entry.
     /// </summary>
+    /// <param name="windowHandle">The handle to the window which executes the command.</param>
     /// <param name="executeSynchronous">A value indicating whether the command is executed synchronously or not.
     /// Note that synchronous execution is not supported by all context menu entries.</param>
-    void ExecuteCommand(bool executeSynchronous = false);
+    /// <returns>0 if the execution was successful, INT32_MIN if no valid context menu instance exist 
+    /// or the HRESULT code from the call to InvokeCommand.</returns>
+    int32_t ExecuteCommand(HWND windowHandle, bool executeSynchronous = false);
 
     /// <summary>
     /// Prints the context menu to the console.

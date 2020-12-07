@@ -97,14 +97,17 @@ JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenu_deleteU
   }
 }
 
-JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenuEntry_executeNativeCommand(JNIEnv* env, jobject instance, jboolean executeSynchronous)
+JNIEXPORT jint JNICALL Java_explorercontextmenu_menu_ExplorerContextMenuEntry_executeCommand(JNIEnv* env, jobject instance, jlong windowHandle, jboolean executeSynchronous)
 {
+  int32_t result = INT32_MIN;
   JavaExplorerContextMenuEntry javaEntry(env, instance);
   ExplorerContextMenuEntry* entry = javaEntry.GetNativeHandle();
   if (entry != nullptr)
   {
-    entry->ExecuteCommand(executeSynchronous);
+    result = entry->ExecuteCommand((HWND)windowHandle, executeSynchronous);
   }
+
+  return result;
 }
 
 /***********************************************************************************************************************

@@ -122,7 +122,7 @@ void JavaExplorerContextMenuEntry::SetCommandId(int32_t value)
   }
 }
 
-void JavaExplorerContextMenuEntry::SetCommandString(wstring& value)
+void JavaExplorerContextMenuEntry::SetCommandString(string& value)
 {
   this->InvokeStringSetterMethod("setCommandString", value);
 }
@@ -207,6 +207,16 @@ void JavaExplorerContextMenuEntry::InvokeLongSetterMethod(const char* methodName
   if (setterMethod != nullptr)
   {
     this->javaEnvironment->CallVoidMethod(this->javaInstace, setterMethod, value);
+  }
+}
+
+void JavaExplorerContextMenuEntry::InvokeStringSetterMethod(const char* methodName, string& value)
+{
+  jmethodID setterMethod = this->javaEnvironment->GetMethodID(this->javaClass, methodName, "(Ljava/lang/String;)V");
+  if (setterMethod != nullptr)
+  {
+    jstring jValue = this->javaEnvironment->NewStringUTF(value.c_str());
+    this->javaEnvironment->CallVoidMethod(this->javaInstace, setterMethod, jValue);
   }
 }
 

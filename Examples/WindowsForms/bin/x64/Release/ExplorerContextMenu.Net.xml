@@ -50,10 +50,13 @@ Gets or sets the help text of the entry.
 Gets or sets the text of the entry.
 </summary>
         </member>
-        <member name="M:ContextQuickie.NetExplorerContextMenuEntry.ExecuteCommand">
+        <member name="M:ContextQuickie.NetExplorerContextMenuEntry.ExecuteCommand(System.IntPtr)">
             <summary>
 Executes the context menu entry command.
 </summary>
+            <param name="windowHandle">The handle to the window which executes the command.</param>
+            <returns>0 if the execution was successful, INT32_MIN if no valid context menu instance exist 
+or the HRESULT code from the call to InvokeCommand.</returns>
         </member>
         <member name="M:ContextQuickie.NetExplorerContextMenuEntry.#ctor">
             <summary>
@@ -101,6 +104,14 @@ Constructor which creates the context menu.
             <param name="createDefaultMenu">A value indicating whether the default menu will be loaded or not.</param>
             <param name="extendedMenuWhitelist">A list of context menu extension CLSIDs which are loaded. If the list is empty, all available extensions are loaded.</param>
         </member>
+        <member name="M:ContextQuickie.ExplorerContextMenu.GetAvailableMenuExtensions(std.vector&lt;std.basic_string&lt;System.Char,std.char_traits{System.Char},std.allocator&lt;System.Char&gt;&gt;,std.allocator&lt;std.basic_string&lt;System.Char,std.char_traits{System.Char},std.allocator&lt;System.Char&gt;&gt;&gt;&gt;*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
+            <summary>
+Gets the CLSIDs for all installed context menu extensions from the registry.
+</summary>
+            <param name="target">A list in which the CLSIDs are stored.</param>
+            <returns>
+                <c>true</c> if retrieving the CLSIDs from the registry was successful; otherwise <c>false</c>.</returns>
+        </member>
         <member name="M:ContextQuickie.ExplorerContextMenu.GetExtendedContextMenu(IShellFolder*,_ITEMIDLIST!System.Runtime.CompilerServices.IsConst**,System.UInt32,std.set&lt;std.basic_string&lt;System.Char,std.char_traits{System.Char},std.allocator&lt;System.Char&gt;&gt;,std.less&lt;std.basic_string&lt;System.Char,std.char_traits{System.Char},std.allocator&lt;System.Char&gt;&gt;&gt;,std.allocator&lt;std.basic_string&lt;System.Char,std.char_traits{System.Char},std.allocator&lt;System.Char&gt;&gt;&gt;&gt;!System.Runtime.CompilerServices.IsConst*!System.Runtime.CompilerServices.IsImplicitlyDereferenced)">
             <summary>
 Loads the extended explorer context menu.
@@ -142,12 +153,15 @@ Prints the context menu to the console.
 </summary>
             <param name="level">The indentation level for printing the commands.</param>
         </member>
-        <member name="M:ContextQuickie.ExplorerContextMenuEntry.ExecuteCommand(System.Boolean)">
+        <member name="M:ContextQuickie.ExplorerContextMenuEntry.ExecuteCommand(HWND__*,System.Boolean)">
             <summary>
 Executes the command for this entry.
 </summary>
+            <param name="windowHandle">The handle to the window which executes the command.</param>
             <param name="executeSynchronous">A value indicating whether the command is executed synchronously or not.
 Note that synchronous execution is not supported by all context menu entries.</param>
+            <returns>0 if the execution was successful, INT32_MIN if no valid context menu instance exist 
+or the HRESULT code from the call to InvokeCommand.</returns>
         </member>
         <member name="M:ContextQuickie.ExplorerContextMenuEntry.GetBitmapPixelData(System.UInt32,System.UInt32,System.UInt32,System.UInt32,System.Void*)">
             <summary>

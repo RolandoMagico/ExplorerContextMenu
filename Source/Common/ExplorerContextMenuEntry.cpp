@@ -106,12 +106,12 @@ namespace ContextQuickie
       }
 
       // Get data from IContextMenu
-      memset(buffer, 0, sizeof(buffer));
-      if (SUCCEEDED(contextMenu->GetCommandString(this->CommandId, GCS_VERBW, NULL, (CHAR*)buffer, MAX_STRING_LENGTH)))
+      char commandBuffer[MAX_STRING_LENGTH] = { 0 };
+      if (SUCCEEDED(contextMenu->GetCommandString(this->CommandId, GCS_VERBA, NULL, commandBuffer, MAX_STRING_LENGTH)))
       {
-        if (wcslen(buffer) != 0)
+        if (strlen(commandBuffer) != 0)
         {
-          this->CommandString = new wstring(buffer);
+          this->CommandString = new string(commandBuffer);
         }
       }
 
@@ -280,21 +280,33 @@ namespace ContextQuickie
     return result;
   }
 
-  void ExplorerContextMenuEntry::ExecuteCommand(bool executeSynchronous)
+  int32_t ExplorerContextMenuEntry::ExecuteCommand(HWND windowHandle, bool executeSynchronous)
   {
+    int32_t result = INT32_MIN;
     if (this->ContextMenu != nullptr)
     {
       CMINVOKECOMMANDINFO info = { 0 };
       info.cbSize = sizeof(info);
+      info.hwnd = windowHandle;
 
       if (executeSynchronous == true)
       {
         info.fMask |= CMIC_MASK_NOASYNC;
       }
 
-      info.lpVerb = MAKEINTRESOURCEA(this->CommandId);
-      this->ContextMenu->InvokeCommand(&info);
+      if (this->CommandString != nullptr)
+      {
+        info.lpVerb = this->CommandString->c_str();
+      }
+      else
+      {
+        info.lpVerb = MAKEINTRESOURCEA(this->CommandId);
+      }
+
+      result = this->ContextMenu->InvokeCommand(&info);
     }
+
+    return result;
   }
 
   size_t ExplorerContextMenuEntry::GetAllEntriesCount()

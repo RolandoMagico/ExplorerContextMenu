@@ -9,11 +9,11 @@ extern "C" {
 #endif
 /*
  * Class:     explorercontextmenu_menu_ExplorerContextMenuEntry
- * Method:    executeNativeCommand
- * Signature: (Z)V
+ * Method:    executeCommand
+ * Signature: (JZ)I
  */
-JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenuEntry_executeNativeCommand
-  (JNIEnv *, jobject, jboolean);
+JNIEXPORT jint JNICALL Java_explorercontextmenu_menu_ExplorerContextMenuEntry_executeCommand
+  (JNIEnv *, jobject, jlong, jboolean);
 
 #ifdef __cplusplus
 }

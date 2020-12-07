@@ -91,6 +91,13 @@ namespace ContextQuickie
     /// </summary>
     /// <param name="methodName">The name of the Java method.</param>
     /// <param name="value">The value which is passed to the method during the call.</param>
+    void InvokeStringSetterMethod(const char* methodName, string& value);
+
+    /// <summary>
+    /// Invokes a setter method of the java instance which has a string value as argument and void as return value.
+    /// </summary>
+    /// <param name="methodName">The name of the Java method.</param>
+    /// <param name="value">The value which is passed to the method during the call.</param>
     void InvokeStringSetterMethod(const char* methodName, wstring& value);
 
     /// <summary>
@@ -115,7 +122,7 @@ namespace ContextQuickie
     /// Sets the command string in the Java instance to the specific value.
     /// </summary>
     /// <param name="value">The value to set.</param>
-    void SetCommandString(wstring& value);
+    void SetCommandString(string& value);
     
     /// <summary>
     /// Copies the image data from the bitmap handle to the java instance.

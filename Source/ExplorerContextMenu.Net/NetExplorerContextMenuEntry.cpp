@@ -105,12 +105,15 @@ namespace ContextQuickie
     }
   }
 
-  void NetExplorerContextMenuEntry::ExecuteCommand()
+  Int32 NetExplorerContextMenuEntry::ExecuteCommand(IntPtr windowHandle)
   {
+    Int32 result = Int32::MinValue;
     if (this->nativeEntry != nullptr)
     {
-      this->nativeEntry->ExecuteCommand();
+      result = this->nativeEntry->ExecuteCommand(NULL);
     }
+
+    return result;
   }
 
   UInt32 NetExplorerContextMenuEntry::CommandId::get()
