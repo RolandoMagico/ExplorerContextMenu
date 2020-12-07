@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     explorercontextmenu_menu_ExplorerContextMenu
  * Method:    getEntries
- * Signature: ([Ljava/lang/String;Z[Ljava/lang/String;)V
+ * Signature: ([Ljava/lang/String;Z[Ljava/lang/String;[Ljava/lang/String;)V
  */
 JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenu_getEntries
-  (JNIEnv *, jobject, jobjectArray, jboolean, jobjectArray);
+  (JNIEnv *, jobject, jobjectArray, jboolean, jobjectArray, jobjectArray);
 
 /*
  * Class:     explorercontextmenu_menu_ExplorerContextMenu

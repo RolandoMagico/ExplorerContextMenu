@@ -63,6 +63,7 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
   }
 
   set<wstring> whitelist;
+  set<wstring> blacklist;
 
   // 7-Zip: 
   // whitelist.insert(L"{23170F69-40C1-278A-1000-000100020000}");
@@ -71,9 +72,15 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
   // whitelist.insert(L"{B298D29A-A6ED-11DE-BA8C-A68E55D89593}");
 
   // TortoiseHg:
-  whitelist.insert(L"{46605027-5B8C-4DCE-BFE0-051B7972D64C}");
+  // whitelist.insert(L"{46605027-5B8C-4DCE-BFE0-051B7972D64C}");
 
-  ExplorerContextMenu contextMenu(paths, true, whitelist);
+  // Modern Sharing
+  // blacklist.insert(L"{e2bf9676-5f8f-435c-97eb-11607a5bedf7}");
+
+  // Sharing
+  // blacklist.insert(L"{f81e9010-6ea4-11ce-a7ff-00aa003ca9f6}");
+
+  ExplorerContextMenu contextMenu(paths, true, whitelist, blacklist);
   contextMenu.PrintMenu();
   return 0;
 }

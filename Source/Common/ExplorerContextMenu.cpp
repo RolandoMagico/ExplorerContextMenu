@@ -55,7 +55,7 @@
 ***********************************************************************************************************************/
 namespace ContextQuickie
 {
-  ExplorerContextMenu::ExplorerContextMenu(const vector<wstring>& paths, bool createDefaultMenu, const set<wstring>& extendedMenuWhitelist)
+  ExplorerContextMenu::ExplorerContextMenu(const vector<wstring>& paths, bool createDefaultMenu, const set<wstring>& extendedMenuWhitelist, const set<wstring>& extendedMenuBlacklist)
   {
     HRESULT result = S_OK;
     IShellFolder* desktop = nullptr;
@@ -103,7 +103,7 @@ namespace ContextQuickie
       if (SUCCEEDED(result))
       {
         // Create extended context menu only if default was either skipped or successful
-        if (FAILED(result = this->GetExtendedContextMenu(desktop, itemIdListArg, itemIdListLength, extendedMenuWhitelist)))
+        if (FAILED(result = this->GetExtendedContextMenu(desktop, itemIdListArg, itemIdListLength, extendedMenuWhitelist, extendedMenuBlacklist)))
         {
           // Something went wrong when creating the exteneded menu
         }
@@ -147,7 +147,7 @@ namespace ContextQuickie
     return result;
   }
 
-  HRESULT ExplorerContextMenu::GetExtendedContextMenu(IShellFolder* desktop, LPCITEMIDLIST* itemIdList, UINT itemIdListLength, const set<wstring>& extendedMenuWhitelist)
+  HRESULT ExplorerContextMenu::GetExtendedContextMenu(IShellFolder* desktop, LPCITEMIDLIST* itemIdList, UINT itemIdListLength, const set<wstring>& extendedMenuWhitelist, const set<wstring>& extendedMenuBlacklist)
   {
     HRESULT result = S_OK;
     IDataObject* dataObject = nullptr;
@@ -171,32 +171,35 @@ namespace ContextQuickie
     }
     else
     {
-      for (size_t extensionIndex = 0; extensionIndex < extensions.size(); extensionIndex++)
+      for (wstring extension : extensions)
       {
         // Convert string to CLSID. 
         // Because coversion to GUID is already tested in GetAvailableMenuExtensions, no return value check is required here
         GUID CLSID_NewMenu;
-        (void)CLSIDFromString(extensions.at(extensionIndex).c_str(), &CLSID_NewMenu);
+        (void)CLSIDFromString(extension.c_str(), &CLSID_NewMenu);
 
-        if ((extendedMenuWhitelist.empty() || (extendedMenuWhitelist.find(extensions.at(extensionIndex).c_str()) != extendedMenuWhitelist.end())))
+        if ((extendedMenuWhitelist.empty() || (extendedMenuWhitelist.find(extension) != extendedMenuWhitelist.end())))
         {
-          IShellExtInit* shellExtInit;
-          if (FAILED(result = CoCreateInstance(CLSID_NewMenu, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellExtInit))))
+          if (extendedMenuBlacklist.find(extension) == extendedMenuBlacklist.end())
           {
-            // Failed to create an IShellExtInit instance :-(
-          }
-          else if (FAILED(result = shellExtInit->Initialize(NULL, dataObject, NULL)))
-          {
-            // Failed to initialied the shell extension
-            shellExtInit->Release();
-          }
-          else
-          {
-            this->shellExtensions.push_back(shellExtInit);
-            IContextMenu* contextMenu;
-            if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_PPV_ARGS(&contextMenu))))
+            IShellExtInit* shellExtInit;
+            if (FAILED(result = CoCreateInstance(CLSID_NewMenu, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&shellExtInit))))
             {
-              this->GetMenuData(contextMenu, CMF_NORMAL);
+              // Failed to create an IShellExtInit instance :-(
+            }
+            else if (FAILED(result = shellExtInit->Initialize(NULL, dataObject, NULL)))
+            {
+              // Failed to initialied the shell extension
+              shellExtInit->Release();
+            }
+            else
+            {
+              this->shellExtensions.push_back(shellExtInit);
+              IContextMenu* contextMenu;
+              if (SUCCEEDED(result = shellExtInit->QueryInterface(IID_PPV_ARGS(&contextMenu))))
+              {
+                this->GetMenuData(contextMenu, CMF_NORMAL);
+              }
             }
           }
         }

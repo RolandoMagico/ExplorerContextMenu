@@ -71,17 +71,20 @@ static void Java_explorercontextmenu_menu_CopyStringArrayToVector(JNIEnv* env, j
   }
 }
 
-JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenu_getEntries(JNIEnv* env, jobject instance, jobjectArray paths, jboolean createDefaultMenu, jobjectArray extendedMenuWhitelist)
+JNIEXPORT void JNICALL Java_explorercontextmenu_menu_ExplorerContextMenu_getEntries(JNIEnv* env, jobject instance, jobjectArray paths, jboolean createDefaultMenu, jobjectArray whitelist, jobjectArray blacklist)
 {
   vector<wstring> convertedPaths;
-  vector<wstring> tempExtendedMenuWhitelist;
+  vector<wstring> tempWhitelist;
+  vector<wstring> tempBlacklist;
 
   Java_explorercontextmenu_menu_CopyStringArrayToVector(env, paths, convertedPaths);
-  Java_explorercontextmenu_menu_CopyStringArrayToVector(env, extendedMenuWhitelist, tempExtendedMenuWhitelist);
+  Java_explorercontextmenu_menu_CopyStringArrayToVector(env, whitelist, tempWhitelist);
+  Java_explorercontextmenu_menu_CopyStringArrayToVector(env, blacklist, tempBlacklist);
 
-  set<wstring> convertedExtendedMenuWhitelist(tempExtendedMenuWhitelist.begin(), tempExtendedMenuWhitelist.end());
+  set<wstring> convertedWhitelist(tempWhitelist.begin(), tempWhitelist.end());
+  set<wstring> convertedBlacklist(tempBlacklist.begin(), tempBlacklist.end());
 
-  ExplorerContextMenu* menu = new ExplorerContextMenu(convertedPaths, createDefaultMenu, convertedExtendedMenuWhitelist);
+  ExplorerContextMenu* menu = new ExplorerContextMenu(convertedPaths, createDefaultMenu, convertedWhitelist, convertedBlacklist);
   JavaExplorerContextMenuEntry wrapper(env, instance);
   wrapper.SetNativeHandle(menu);
   wrapper.CopyEntries(*menu);

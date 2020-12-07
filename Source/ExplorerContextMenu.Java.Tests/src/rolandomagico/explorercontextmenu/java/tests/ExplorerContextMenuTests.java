@@ -59,7 +59,7 @@ class ExplorerContextMenuTests
   @Test
   void testEmptyPathsList()
   {
-    ExplorerContextMenu menu = new ExplorerContextMenu(new String[0], true, new String[0]);
+    ExplorerContextMenu menu = new ExplorerContextMenu(new String[0], true, null, null);
     assertFalse(menu.getEntries().iterator().hasNext());
   }
   
@@ -69,7 +69,7 @@ class ExplorerContextMenuTests
   @Test
   public void testOneFileAsPaths() throws IOException
   {
-    ExplorerContextMenu menu = new ExplorerContextMenu(new String[] { this.createTempFile() }, true, null);
+    ExplorerContextMenu menu = new ExplorerContextMenu(new String[] { this.createTempFile() }, true, null, null);
     assertTrue(menu.getEntries().iterator().hasNext());
   }
 
@@ -79,7 +79,7 @@ class ExplorerContextMenuTests
   @Test
   public void testTwoFilesAsPaths() throws IOException
   {
-    ExplorerContextMenu menu = new ExplorerContextMenu(new String[] { this.createTempFile(), this.createTempFile() }, true, null);
+    ExplorerContextMenu menu = new ExplorerContextMenu(new String[] { this.createTempFile(), this.createTempFile() }, true, null, null);
     assertTrue(menu.getEntries().iterator().hasNext());
   }
 
@@ -89,7 +89,7 @@ class ExplorerContextMenuTests
   @Test
   public void testOneDirectoryAsPaths() throws IOException
   {
-    ExplorerContextMenu menu = new ExplorerContextMenu(new String[] { this.createTempDirectory() }, true, null);
+    ExplorerContextMenu menu = new ExplorerContextMenu(new String[] { this.createTempDirectory() }, true, null, null);
     assertTrue(menu.getEntries().iterator().hasNext());
   }
 
@@ -99,7 +99,7 @@ class ExplorerContextMenuTests
   @Test
   public void testTwoDirectoriesAsPaths() throws IOException
   {
-    ExplorerContextMenu menu = new ExplorerContextMenu(new String[] { this.createTempDirectory() }, true, null);
+    ExplorerContextMenu menu = new ExplorerContextMenu(new String[] { this.createTempDirectory() }, true, null, null);
     assertTrue(menu.getEntries().iterator().hasNext());
   }
 
@@ -109,7 +109,7 @@ class ExplorerContextMenuTests
   @Test
   public void testTwoDirectoriesWithDifferentParentsAsPaths() throws IOException
   {
-    ExplorerContextMenu menu = new ExplorerContextMenu(new String[] { this.createTempDirectory(), Paths.get(this.createTempDirectory()).getParent().toAbsolutePath().toString() }, true, null);
+    ExplorerContextMenu menu = new ExplorerContextMenu(new String[] { this.createTempDirectory(), Paths.get(this.createTempDirectory()).getParent().toAbsolutePath().toString() }, true, null, null);
     assertTrue(menu.getEntries().iterator().hasNext());
   }
 
@@ -120,7 +120,7 @@ class ExplorerContextMenuTests
   @Test
   public void testBeyondCompareWithOneFile() throws IOException
   {
-    ExplorerContextMenu menu = new ExplorerContextMenu(new String[] { this.createTempFile() }, true, null);
+    ExplorerContextMenu menu = new ExplorerContextMenu(new String[] { this.createTempFile() }, true, null, null);
     assertTrue(
         StreamSupport.stream(
             menu.getEntries().spliterator(), false).anyMatch(

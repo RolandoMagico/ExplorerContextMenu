@@ -68,8 +68,9 @@ namespace ContextQuickie
     /// <param name="itemIdList">A list of file system items for which the menu will be created.</param>
     /// <param name="itemIdListLength">The number of items in <see paramref="itemIdList"/></param>
     /// <param name="extendedMenuWhitelist">A list of context menu extension CLSIDs which are loaded. If the list is empty, all available extensions are loaded.</param>
+    /// <param name="extendedMenuBlacklist">A list of context menu extension CLSIDs which are not loaded.</param>
     /// <returns>A value indicating whether loading the default context menu was successful or not.</returns>
-    HRESULT GetExtendedContextMenu(IShellFolder* desktop, LPCITEMIDLIST* itemIdList, UINT itemIdListLength, const set<wstring>& extendedMenuWhitelist);
+    HRESULT GetExtendedContextMenu(IShellFolder* desktop, LPCITEMIDLIST* itemIdList, UINT itemIdListLength, const set<wstring>& extendedMenuWhitelist, const set<wstring>& extendedMenuBlacklist);
 
     /// <summary>
     /// Gets the CLSIDs for all installed context menu extensions from the registry.
@@ -85,7 +86,12 @@ namespace ContextQuickie
     /// <param name="paths">A list of paths for which the context menu will be created.</param>
     /// <param name="createDefaultMenu">A value indicating whether the default menu will be loaded or not.</param>
     /// <param name="extendedMenuWhitelist">A list of context menu extension CLSIDs which are loaded. If the list is empty, all available extensions are loaded.</param>
-    ExplorerContextMenu(const vector<wstring>& paths, bool createDefaultMenu = true, const set<wstring>& extendedMenuWhitelist = set<wstring>());
+    /// <param name="extendedMenuBlacklist">A list of context menu extension CLSIDs which are not loaded.</param>
+    ExplorerContextMenu(const vector<wstring>& paths, bool createDefaultMenu = true, const set<wstring>& extendedMenuWhitelist = set<wstring>(), const set<wstring>& extendedMenuBlacklist = set<wstring>());
+
+    /// <summary>
+    /// Destructor.
+    /// </summary>
     ~ExplorerContextMenu();
   };
 }
