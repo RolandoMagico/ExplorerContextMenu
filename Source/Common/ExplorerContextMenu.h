@@ -64,20 +64,22 @@ namespace ContextQuickie
     /// Loads the extended explorer context menu.
     /// The extended menu contains the entris which are specified by shell extensions in the registry.
     /// </summary>
+    /// <param name="extensions">A set containing all CLSIDs which will be used.</param>
     /// <param name="desktop">A reference to the desktop folder which is used as the parent element for all files/folders.</param>
     /// <param name="itemIdList">A list of file system items for which the menu will be created.</param>
     /// <param name="itemIdListLength">The number of items in <see paramref="itemIdList"/></param>
     /// <param name="extendedMenuWhitelist">A list of context menu extension CLSIDs which are loaded. If the list is empty, all available extensions are loaded.</param>
     /// <param name="extendedMenuBlacklist">A list of context menu extension CLSIDs which are not loaded.</param>
     /// <returns>A value indicating whether loading the default context menu was successful or not.</returns>
-    HRESULT GetExtendedContextMenu(IShellFolder* desktop, LPCITEMIDLIST* itemIdList, UINT itemIdListLength, const set<wstring>& extendedMenuWhitelist, const set<wstring>& extendedMenuBlacklist);
+    HRESULT GetExtendedContextMenu(const vector<wstring>& extensions, IShellFolder* desktop, LPCITEMIDLIST* itemIdList, UINT itemIdListLength, const set<wstring>& extendedMenuWhitelist, const set<wstring>& extendedMenuBlacklist);
 
     /// <summary>
     /// Gets the CLSIDs for all installed context menu extensions from the registry.
     /// </summary>
+    /// <param name="registryPath">The path in the registry where to look for context menu extensions.</param>
     /// <param name="target">A list in which the CLSIDs are stored.</param>
     /// <returns><c>true</c> if retrieving the CLSIDs from the registry was successful; otherwise <c>false</c>.</returns>
-    bool GetAvailableMenuExtensions(vector<wstring>& target);
+    bool GetAvailableMenuExtensions(const wstring& registryPath, vector<wstring>& target);
 
   public:
     /// <summary>

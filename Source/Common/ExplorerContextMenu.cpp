@@ -61,13 +61,15 @@ namespace ContextQuickie
     HRESULT result = S_OK;
     IShellFolder* desktop = nullptr;
     ITEMIDLIST** itemIdList = nullptr;
-    UINT itemIdListLength = 0;
+    uint32_t itemIdListLength = 0;
+    bool pathsContainsFiles = false;
+    bool pathsContainsDirectories = false;
 
     if (paths.empty())
     {
       // Nothing to do if an empty list ist passed
     }
-    else if (paths.size() > UINT_MAX)
+    else if (paths.size() > UINT32_MAX)
     {
       // Too many items, cannot handle that :-(
     }
@@ -82,10 +84,23 @@ namespace ContextQuickie
     else
     {
       this->shellExtensions.push_back(desktop);
-      itemIdListLength = (UINT)paths.size();
+      itemIdListLength = (uint32_t)paths.size();
       itemIdList = new ITEMIDLIST * [paths.size()];
       for (size_t pathIndex = 0; (pathIndex < paths.size()) && SUCCEEDED(result); pathIndex++)
       {
+        uint32_t fileAttributes = GetFileAttributes(paths[pathIndex].c_str());
+        if (fileAttributes != INVALID_FILE_ATTRIBUTES)
+        {
+          if ((fileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+          {
+            pathsContainsDirectories = true;
+          }
+          else
+          {
+            pathsContainsFiles = true;
+          }
+        }
+
         result = desktop->ParseDisplayName(NULL, NULL, (LPWSTR)paths[pathIndex].c_str(), nullptr, &(itemIdList[pathIndex]), NULL);
       }
     }
@@ -103,8 +118,25 @@ namespace ContextQuickie
       
       if (SUCCEEDED(result))
       {
+        vector<wstring> extensions;
+
+        if ((pathsContainsFiles == false) && (pathsContainsDirectories == true))
+        {
+          this->GetAvailableMenuExtensions(L"Directory\\shellex\\ContextMenuHandlers", extensions);
+        }
+
+        if ((pathsContainsFiles == true) && (pathsContainsDirectories == false))
+        {
+          this->GetAvailableMenuExtensions(L"*\\shellex\\ContextMenuHandlers", extensions);
+        }
+
+        this->GetAvailableMenuExtensions(L"AllFilesystemObjects\\shellex\\ContextMenuHandlers", extensions);
+
+        // Ensure that every CLSID is only listed once
+        extensions.erase(unique(extensions.begin(), extensions.end()), extensions.end());
+
         // Create extended context menu only if default was either skipped or successful
-        if (FAILED(result = this->GetExtendedContextMenu(desktop, itemIdListArg, itemIdListLength, extendedMenuWhitelist, extendedMenuBlacklist)))
+        if (FAILED(result = this->GetExtendedContextMenu(extensions, desktop, itemIdListArg, itemIdListLength, extendedMenuWhitelist, extendedMenuBlacklist)))
         {
           // Something went wrong when creating the exteneded menu
         }
@@ -148,21 +180,12 @@ namespace ContextQuickie
     return result;
   }
 
-  HRESULT ExplorerContextMenu::GetExtendedContextMenu(IShellFolder* desktop, LPCITEMIDLIST* itemIdList, UINT itemIdListLength, const set<wstring>& extendedMenuWhitelist, const set<wstring>& extendedMenuBlacklist)
+  HRESULT ExplorerContextMenu::GetExtendedContextMenu(const vector<wstring>& extensions, IShellFolder* desktop, LPCITEMIDLIST* itemIdList, UINT itemIdListLength, const set<wstring>& extendedMenuWhitelist, const set<wstring>& extendedMenuBlacklist)
   {
     HRESULT result = S_OK;
     IDataObject* dataObject = nullptr;
-    HKEY contextMenuHandlers = nullptr;
-    const wstring registryPath(L"*\\shellex\\ContextMenuHandlers");
-    DWORD numberOfSubKey = 0;
-    DWORD subKeyMaxLength = 0;
-    vector<wstring> extensions;
 
-    if (this->GetAvailableMenuExtensions(extensions) == false)
-    {
-      // Unalbe to read context menu extensions from registry
-    }
-    else if (extensions.size() == 0)
+    if (extensions.size() == 0)
     {
       // No extensions availabe, nothing more to do
     }
@@ -189,7 +212,6 @@ namespace ContextQuickie
 
       for (wstring extension : extensions)
       {
-        std::transform(extension.begin(), extension.end(), extension.begin(), ::towlower);
         if ((whitelistLowerCase.empty() || (whitelistLowerCase.find(extension) != whitelistLowerCase.end())))
         {
           if (blacklistLowerCase.find(extension) == blacklistLowerCase.end())
@@ -228,19 +250,14 @@ namespace ContextQuickie
       dataObject->Release();
     }
 
-    if (contextMenuHandlers != nullptr)
-    {
-      RegCloseKey(contextMenuHandlers);
-    }
     return result;
   }
 
-  bool ExplorerContextMenu::GetAvailableMenuExtensions(vector<wstring>& target)
+  bool ExplorerContextMenu::GetAvailableMenuExtensions(const wstring& registryPath, vector<wstring>& target)
   {
     HRESULT result = S_OK;
     LSTATUS registryResult;
     HKEY contextMenuHandlers = nullptr;
-    const wstring registryPath(L"*\\shellex\\ContextMenuHandlers");
     DWORD numberOfSubKey = 0;
     DWORD subKeyMaxLength = 0;
     bool returnValue = false;
@@ -288,7 +305,9 @@ namespace ContextQuickie
 
           if (SUCCEEDED(result))
           {
-            target.push_back(clsidString);
+            wstring clsidStringLowerCase(clsidString);
+            std::transform(clsidStringLowerCase.begin(), clsidStringLowerCase.end(), clsidStringLowerCase.begin(), ::towlower);
+            target.push_back(clsidStringLowerCase);
           }
         }
 
