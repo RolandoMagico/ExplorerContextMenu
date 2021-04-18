@@ -71,6 +71,9 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
   // Notepad++: 
   // whitelist.insert(L"{B298D29A-A6ED-11DE-BA8C-A68E55D89593}");
 
+  // TortoiseGit:
+  // whitelist.insert(L"{10A0FDD2-B0C0-4CD4-A7AE-E594CE3B91C8}");
+
   // TortoiseHg:
   // whitelist.insert(L"{46605027-5B8C-4DCE-BFE0-051B7972D64C}");
 
