@@ -123,6 +123,7 @@ namespace ContextQuickie
         if ((pathsContainsFiles == false) && (pathsContainsDirectories == true))
         {
           this->GetAvailableMenuExtensions(L"Directory\\shellex\\ContextMenuHandlers", extensions);
+          this->GetAvailableMenuExtensions(L"Directory\\Background\\shellex\\ContextMenuHandlers", extensions);
         }
 
         if ((pathsContainsFiles == true) && (pathsContainsDirectories == false))
