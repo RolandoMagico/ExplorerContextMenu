@@ -134,7 +134,17 @@ namespace ContextQuickie
         this->GetAvailableMenuExtensions(L"AllFilesystemObjects\\shellex\\ContextMenuHandlers", extensions);
 
         // Ensure that every CLSID is only listed once
-        extensions.erase(unique(extensions.begin(), extensions.end()), extensions.end());
+        std::set<wstring> unique;
+        auto newEnd = std::remove_if(extensions.begin(), extensions.end(), [&unique] (const wstring &value)
+          {
+            if(unique.find(value) != std::end(unique))
+            {
+              return true;
+            }
+            unique.insert(value);
+            return false;
+          });
+        extensions.erase(newEnd, extensions.end());
 
         // Create extended context menu only if default was either skipped or successful
         if (FAILED(result = this->GetExtendedContextMenu(extensions, desktop, itemIdListArg, itemIdListLength, extendedMenuWhitelist, extendedMenuBlacklist)))
